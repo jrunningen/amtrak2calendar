@@ -24,7 +24,8 @@ It comes in two forms.
 Test the webapp
 ---------------
 
-Visit https://script.google.com/macros/s/AKfycbw3Rq2VlEjjYkNpqBPyE9CLGWBRAAwRTme8iiVtS1u4/dev. 
+Visit the current release at
+https://script.google.com/macros/s/AKfycbxUcmUKjrqB9O32iuxtW7pb-IVA3fFHjmX9dibmviBj2B7wUvbf/exec.
 
 If you're willing to accept the permissions (and they look scary, I know - I'm
 looking for ways to restrict the permission set, but it may not be possible),
