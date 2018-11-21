@@ -52,6 +52,16 @@ the reservation to your calendar.
 To change which calendar you want to sync to, click the "..." button in the
 sidebar to access calendar settings.
 
+Feedback
+--------
+
+If you're brave enough to click past all of the permission warnings, and start
+using Amtrak2Calendar, I'd love to hear how I can make it more useful. You can:
+
+1. [Create an issue](https://github.com/jrunningen/amtrak2calendar/issues/new)
+   on this repository.
+2. Send an email to amtrak2calendar-users@googlegroups.com.
+
 Manual build
 ------------
 
