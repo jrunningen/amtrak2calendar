@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base target="_top">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>
+    function setStatus(statusText) {
+      $('#status').text(statusText);
+    }
+
+    function finishedStatus(result) {
+      setStatus("Finished!");
+    }
+
+    function failedStatus() {
+      setStatus("Failed!");
+    }
+
+    function syncNow() {
+      $('#status').text("Syncing...");
+      google.script.run
+        .withSuccessHandler((results) => {
+          finishedStatus(JSON.stringify(results));
+          displayLastRun(results);
+        })
+        .withFailureHandler(failedStatus)
+        .autoSync();
+    }
+
+    function enableAutoSync() {
+      setStatus("Installing trigger...");
+      google.script.run
+        .withSuccessHandler(() => {
+          finishedStatus();
+          getAutoSyncStatus();
+        })
+        .withFailureHandler(failedStatus)
+        .createAutoSyncTrigger();
+    }
+
+    function disableAutoSync() {
+      setStatus("Removing triggers...");
+      google.script.run
+        .withSuccessHandler(() => {
+          finishedStatus();
+          getAutoSyncStatus();
+        })
+        .withFailureHandler(failedStatus)
+        .removeAllTriggers();
+    }
+
+    function selectNewCalendar(calendarId, calendarName) {
+      setStatus("Switching to calendar \"" + calendarName + "\"...");
+      google.script.run
+        .withSuccessHandler(() => {
+          setStatus("Finished!");
+          $('#selectedCalendarName').text(calendarName);
+        })
+        .withFailureHandler(failedStatus)
+        .setCalendarId(calendarId);
+    }
+
+    function getAutoSyncStatus() {
+      google.script.run
+        .withSuccessHandler((isAutoSyncEnabled) => {
+          if (isAutoSyncEnabled) {
+            $('#autoSyncStatus').text("enabled");
+          } else {
+            $('#autoSyncStatus').text("disabled");
+          }
+        })
+        .withFailureHandler(() => {
+          $('#autoSyncStatus').text(" in an unknown state.");
+        })
+        .isAutoSyncEnabled();
+    }
+
+    /**
+     * Displays a summary of the changes made by Amtrak2Calendar in the last
+     * run.
+     * 
+     * @param results Object The results computed by the last run of
+     *     autoSync().
+     */
+    function displayLastRun(results) {
+      $("#lastRunResults").html('');
+      if (results.reservationsFound.length !== 0) {
+        $("#lastRunResults").append(`
+          <p>Found reservations:</p><ul id="reservationsFound"></ul>
+        `);
+        for (const reservation of results.reservationsFound) {
+          $("#reservationsFound").append(`
+          <li>${reservation}</li>
+          `);
+        }
+      }
+      if (results.reservationsAlreadyPresent.length !== 0) {
+        $("#lastRunResults").append(`
+          <p>ReservationsAlreadyPresent:</p><ul id="reservationsAlreadyPresent"></ul>
+        `);
+        for (const reservation of results.reservationsAlreadyPresent) {
+          $("#reservationsAlreadyPresent").append(`
+          <li>${reservation}</li>
+          `);
+        }
+      }
+      if (results.trainsSynced.length !== 0) {
+        $("#lastRunResults").append(`
+          <p>Newly synced trains:</p><ul id="trainsSynced"></ul>
+        `);
+        for (const train of results.trainsSynced) {
+          $("#trainsSynced").append(`
+          <li>${train}</li>
+          `);
+        }
+      }
+    }
+
+    getAutoSyncStatus();
+  </script>
+</head>
+
+<body>
+  <h1>Welcome to Amtrak2Calendar!</h1>
+  <p>
+    Amtrak2Calendar scans your GMail account for Amtrak reservations, and
+    adds corresponding events to your calendar automatically. This is
+    intended to be like what GMail already does for airline reservations, but
+    for Amtrak, which isn't directly supported.
+  </p>
+  <p>
+    To try it out, click one of the "Sync now" or "Enable auto-sync" buttons.
+  </p>
+  <p>
+    Once you enable auto-sync, then you're all set. You don't need to visit
+    this page again. Amtrak2Calendar will continue to add events to your
+    calendar whenever you make a new Amtrak reservation.
+  </p>
+  <p>
+    When auto-sync is enabled, Amtrak2Calendar runs hourly. This means you
+    won't see your newly-purchased Amtrak reservation in your calendar until
+    the next time the script runs. If you'd like to see it immediately, you
+    can click the button labeled "Sync now."
+  </p>
+  <p>
+    Auto-sync is currently 
+    <span id="autoSyncStatus"> ... </span>.
+  </p>
+  <button type="button" onclick="syncNow()">
+    Sync now
+  </button>
+  <button type="button" onclick="enableAutoSync()">
+    Enable auto-sync
+  </button>
+  <button type="button" onclick="disableAutoSync()">
+    Disable auto-sync
+  </button>
+  <p id="status"></p>
+  <div id="lastRunResults"></div>
+  <p>
+    Amtrak train reservations will be synced to calendar: 
+    <span id="selectedCalendarName"><?= selectedCalendar.name ?></span>
+  </p>
+  <p>To use a different calendar, click one of the following buttons:</p>
+  <ul>
+    <? calendars.forEach(function(calendar){ ?>
+      <li>
+      <button type="button" onclick="selectNewCalendar(<?= calendar.id ?>, <?= calendar.name ?>)">
+        <?= calendar.name ?>
+      </button>
+      </li>
+    <? }) ?>
+  </ul>
+</body>
+
+</html>
