@@ -90,3 +90,5 @@ Barring some kind of security flaw, Amtrak2Calendar doesn't collect or send your
 * `https://www.googleapis.com/auth/userinfo.email` - This lets Amtrak2Calendar view your email address, so that it can add you to the guest list of calendar events it creates.
 * `https://www.googleapis.com/auth/script.scriptapp` - Installs a recurring trigger to sync your trains to your calendar automatically.
 * `https://www.googleapis.com/auth/script.external_request` - This is used to load the momentjs and moment-timezone libraries necessary to convert dates. These URLs are whitelisted in appsscript.json.
+
+[![clasp](https://img.shields.io/badge/built%20with-clasp-4285f4.svg)](https://github.com/google/clasp)
