@@ -1,7 +1,6 @@
 {
   "oauthScopes": [
     "https://mail.google.com/",
-    "https://www.googleapis.com/auth/gmail.addons.execute",
     "https://www.googleapis.com/auth/calendar.events",
     "https://www.googleapis.com/auth/calendar.readonly",
     "https://www.googleapis.com/auth/drive",
@@ -16,11 +15,6 @@
       "userSymbol": "Drive",
       "serviceId": "drive",
       "version": "v2"
-    }],
-    "libraries": [{
-      "userSymbol": "Moment",
-      "libraryId": "15hgNOjKHUG4UtyZl9clqBbl23sDvWMS8pfDJOyIapZk5RBqwL3i-rlCo",
-      "version": "9"
     }]
   },
   "webapp": {
@@ -31,20 +25,5 @@
     "https://momentjs.com/downloads/moment.min.js",
     "https://momentjs.com/downloads/moment-timezone-with-data-2012-2022.min.js"
   ],
-  "exceptionLogging": "STACKDRIVER",
-  "gmail": {
-    "name": "Amtrak2Calendar",
-    "logoUrl": "https://www.gstatic.com/images/icons/material/system/2x/train_black_24dp.png",
-    "contextualTriggers": [{
-      "unconditional": {
-      },
-      "onTriggerFunction": "buildAddOn"
-    }],
-    "universalActions": [{
-      "text": "Settings...",
-      "runFunction": "showSettingsMenu"
-    }],
-    "primaryColor": "#4285F4",
-    "secondaryColor": "#4285F4"
-  }
+  "exceptionLogging": "STACKDRIVER"
 }
