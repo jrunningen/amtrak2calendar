@@ -12,11 +12,11 @@ const SEARCH_RANGE = '6m';
 
 /**
  * Return the webpage template.
- * 
+ *
  * From here, users can enable or disable syncing their trains.
  */
 function doGet() {
-  const template = HtmlService.createTemplateFromFile('src/Index');
+  const template = HtmlService.createTemplateFromFile('Index');
   const template.isAutoSyncEnabled = false
 
   const calendars = CalendarApp.getAllOwnedCalendars();
@@ -38,15 +38,25 @@ function doGet() {
 }
 
 /**
+ * Print a snippet of HTML from the named file. For including HTML fragments in
+ * HTML templates. Based on the example at
+ * https://developers.google.com/apps-script/guides/html/best-practices#separate_html_css_and_javascript
+ * @param filename The HTML snippet to be included.
+ */
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
+
+/**
  * Returns true if there's a time-based trigger that runs autoSync().
- * 
+ *
  * This tells the user whether they should expect train reservations to sync to
  * the calendar or not.
  */
 function isAutoSyncEnabled() {
   const triggers = ScriptApp.getProjectTriggers();
   for (const trigger of triggers) {
-    if (trigger.getHandlerFunction === "autoSync" && 
+    if (trigger.getHandlerFunction === "autoSync" &&
         trigger.getEventType() === ScriptApp.EventType.CLOCK) ) {
           return true;
     }
@@ -56,7 +66,7 @@ function isAutoSyncEnabled() {
 
 /**
  * Set up a time-based trigger for automatic syncing.
- * 
+ *
  * Removes all other triggers.
  */
 function createAutoSyncTrigger() {
@@ -202,11 +212,11 @@ export function getTrainsFromMessageBody(messageBody: string): Train[] {
       const arrive = depart.clone().add(1, "hour");
       const trainName = match[1];
       const train = new Train(
-        trainName, 
+        trainName,
         "???",
         "???",
-        reservationNumber, 
-        depart, 
+        reservationNumber,
+        depart,
         arrive
       );
       trains.push(train);
@@ -218,9 +228,9 @@ export function getTrainsFromMessageBody(messageBody: string): Train[] {
 
 /**
  * Get all trains from a single reservation message.
- * 
- * @param message 
- * @param cancelledReservationNumbers 
+ *
+ * @param message
+ * @param cancelledReservationNumbers
  */
 function getTrains(message, cancelledReservationNumbers) {
 }

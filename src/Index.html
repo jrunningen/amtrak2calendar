@@ -3,6 +3,7 @@
 
 <head>
   <base target="_top">
+  <?!= include('Stylesheet'); ?>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script>
     function setStatus(statusText) {
@@ -79,7 +80,7 @@
     /**
      * Displays a summary of the changes made by Amtrak2Calendar in the last
      * run.
-     * 
+     *
      * @param results Object The results computed by the last run of
      *     autoSync().
      */
@@ -154,7 +155,7 @@
       can click the button labeled "Sync now."
     </p>
     <p>
-      Auto-sync is currently 
+      Auto-sync is currently
       <span id="autoSyncStatus"> ... </span>.
     </p>
     <button type="button" onclick="syncNow()">
@@ -169,7 +170,7 @@
     <p id="status"></p>
     <div id="lastRunResults"></div>
     <p>
-      Amtrak train reservations will be synced to calendar: 
+      Amtrak train reservations will be synced to calendar:
       <span id="selectedCalendarName"><?= selectedCalendar.name ?></span>
     </p>
     <p>To use a different calendar, click one of the following buttons:</p>
