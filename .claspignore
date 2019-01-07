@@ -1,9 +1,0 @@
-# Tests and node libraries don't function on Google Apps Script, so they are not pushed to the project.
-**/spec/**
-**/node_modules/**
-**/node_modules/**/.*
-lib/jasmine_examples/**
-tools/**
-
-# I don't know why the above patterns fail to exclude this file.
-node_modules/ajv/.tonic_example.js
