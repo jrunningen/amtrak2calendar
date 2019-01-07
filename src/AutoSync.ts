@@ -165,7 +165,13 @@ function autoSync() {
       // FIXME: There's room for improvement in the logic here. This will sync both
       // trains in a round trip, even if one already has a calendar event, possibly
       // resulting in duplicate reservations.
-      const trains = Train.FromOcrText(ticketText);
+      try {
+        const trains = Train.FromOcrText(ticketText);
+      } catch (error) {
+        Logger.log("Failed to parse reservation " + reservationNumber + ": " + error)
+        reservationsFailed.push(reservationNumber);
+        continue;
+      }
 
       for (const train of trains) {
         Logger.log("  Train: %s", train.train);
