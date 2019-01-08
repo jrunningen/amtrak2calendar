@@ -264,6 +264,27 @@ describe("Train", () => {
           ),
         ],
       ],
+      [
+        "amtrak text 1D4433.txt",
+        [
+          new Train(
+            "173",
+            "NYP",
+            "WAS",
+            "1D4433",
+            ezDate("2019-01-11 15:35 -0500"),
+            ezDate("2019-01-11 19:10 -0500"),
+          ),
+          new Train(
+            "158",
+            "WAS",
+            "NYP",
+            "1D4433",
+            ezDate("2019-01-13 18:20 -0500"),
+            ezDate("2019-01-13 21:45 -0500"),
+          ),
+        ],
+      ],
     ]);
     const testdataPath = "spec/testdata";
     for (const file of testCases.keys()) {

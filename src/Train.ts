@@ -13,7 +13,7 @@ function ocrRegexp(): RegExp {
     // "ACELA Nov EXPRESS 25, 2018 WASHINGTON - NEW YORK (PENN".
     /(\b\d{4}\b)/,
     // Non-greedily consume extra text until departure and arrival times.
-    /[\s\S]*?^/,
+    /[\s\S]*?/,
     // Departure and arrival times come after "DEPARTS ARRIVES".
     /DEPARTS ARRIVES /,
     // This is the date string, like "(Sun Nov 25)".
@@ -21,7 +21,7 @@ function ocrRegexp(): RegExp {
     // Departure time of day.
     /(\d+:\d+ (?:AM|PM)) /,
     // Arrival time of day.
-    /(\d+:\d+ (?:AM|PM) ?)$/,
+    /(\d+:\d+ (?:AM|PM) ?)/,
   ];
 
   // Mash it all into one big RegExp.

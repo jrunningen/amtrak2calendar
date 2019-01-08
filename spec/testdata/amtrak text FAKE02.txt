@@ -12,7 +12,7 @@ TRAIN 125
 NORTHEAST Dec 19, REGIONAL 2018 NEW YORK (PENN STATION) -
 WASHINGTON 1 Business Class Seat
 DEPARTS ARRIVES (Wed Dec 19) 11:35 AM 3:06 PM
-PASSENGERS (1) AMTRAK GUEST REWARDS
+
 xxx, xxx ADULT xxx | SELECT
 Proper identification is required for all passengers. This document is valid for only passengers listed. See www.amtrak.com/ID for details.
 IMPORTANT INFORMATION
