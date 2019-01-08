@@ -66,8 +66,8 @@ export function getTrainCalendarEvents(train: Train) {
 export function getReservationCalendarEvents(reservationNumber: string) {
   var now = new Date();
   var oneYearFromNow = new Date(now.getTime() + (12 * 30 * 24 * 60 * 60 * 1000));
-  return CalendarApp.getDefaultCalendar().getEvents(
-    now, 
+  return getCalendar().getEvents(
+    now,
     oneYearFromNow,
     {search: `Amtrak2Calendar ${reservationNumber}`});
 }
