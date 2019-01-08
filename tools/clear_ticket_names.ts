@@ -19,5 +19,5 @@ const testDataDir = "spec/testdata";
 for (const filename of readdirSync(testDataDir)) {
 	const filepath = join(testDataDir, filename);
 	const ticketText = readFileSync(filepath, "utf8");
-	writeFileSync(filepath, ticketText.replace(/PASSENGERS.*$\n.*\n/m, ""));
+	writeFileSync(filepath, ticketText.replace(/PASSENGERS[\s\S]*/m, ""));
 }
