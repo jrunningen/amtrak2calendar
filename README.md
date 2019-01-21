@@ -15,8 +15,7 @@ How to Use
 Amtrak2Calendar is not yet available in the G Suite Marketplace - I need some
 testers first. If you're a frequent Amtrak rider, you can help test it!
 
-Try the current release at
-https://script.google.com/macros/s/AKfycbz4jQLaKLNh_rsKbm4dAk14wsl8V6U1fyHJnQt3KqVD9JgjZPYzVaz0tc-oFLYQ2jezew/exec.
+Try the [current release](http://amtrak2calendar.runningen.net).
 
 If you're willing to accept the permissions (and they look scary, I know - I'm
 looking for ways to restrict the permission set, but it may not be possible),
