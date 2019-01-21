@@ -18,8 +18,12 @@ function ocrRegexp(): RegExp {
     /DEPARTS ARRIVES /,
     // This is the date string, like "(Sun Nov 25)".
     /\((.+?)\) /,
+    // Consume extra misaligned text.
+    /[\s\S]*?/,
     // Departure time of day.
     /(\d+:\d+ (?:AM|PM)) /,
+    // Consume extra misaligned text.
+    /[\s\S]*?/,
     // Arrival time of day.
     /(\d+:\d+ (?:AM|PM) ?)/,
   ];

@@ -285,6 +285,27 @@ describe("Train", () => {
           ),
         ],
       ],
+      [
+        "amtrak text scrambled.txt",
+        [
+          new Train(
+            "174",
+            "WAS",
+            "NYP",
+            "123456",
+            ezDate("2019-01-18 10:10 -0500"),
+            ezDate("2019-01-18 13:35 -0500"),
+          ),
+          new Train(
+            "2257",
+            "NYP",
+            "WAS",
+            "123456",
+            ezDate("2019-01-21 19:00 -0500"),
+            ezDate("2019-01-21 21:59 -0500"),
+          ),
+        ],
+      ],
     ]);
     const testdataPath = "spec/testdata";
     for (const file of testCases.keys()) {
