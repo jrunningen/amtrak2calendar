@@ -6,6 +6,5 @@
   "helpers": [
     "helpers/**/*.ts"
   ],
-	"oneFailurePerSpec": true,
-  "random": true
+  "oneFailurePerSpec": true
 }
