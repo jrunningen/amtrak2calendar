@@ -21,72 +21,72 @@
     </div>
   </div>
   <div class="container">
-		<div class="help">
-			<h1>How does this work?</h1>
-			<p>
-				Amtrak2Calendar scans your GMail account for Amtrak reservations, and
-				adds corresponding events to your calendar automatically. This is
-				intended to be like what GMail already does for airline reservations, but
-				for Amtrak, which isn't directly supported.
-			</p>
-			<h1>Okay, sync my Amtrak trains.</h1>
-			<p>
-				To try it out, click one of the "Sync now" or "Enable auto-sync" buttons.
-			</p>
-			<h1>Auto-sync?</h1>
-			<p>
-				Once you enable auto-sync, then you're all set. You don't need to visit
-				this page again. Amtrak2Calendar will continue to add events to your
-				calendar whenever you make a new Amtrak reservation.
-			</p>
-			<p>
-				When auto-sync is enabled, Amtrak2Calendar runs hourly. This means you
-				won't see your newly-purchased Amtrak reservation in your calendar until
-				the next time the script runs. If you'd like to see it immediately, you
-				can click the button labeled "Sync now."
-			</p>
-			<h1>I changed my mind, turn it off.</h1>
-			<p>
-				No problem. Click the "disable automatic syncing" button.
-			</p>
-			<p>
-				If you want to remove Amtrak2Calendar's access to your Google account,
-				go to <a href="https://myaccount.google.com/permissions">your security
-				page</a> and remove Amtrak2Calendar's access. Trains will stop being
-			  synced. If you have privacy concerns, please
-				<a href="https://github.com/jrunningen/amtrak2calendar/issues/new">file an issue</a>.
-			</p>
-		</div>
-		<div class="controls">
-			<h1>Syncing</h1>
-			<button type="button" onclick="syncNow()">
-				Sync now
-			</button>
-			<p>
-				Auto-sync is currently
-				<strong><span id="autoSyncStatus"> ... </span></strong>.
-			</p>
-			<button type="button" onclick="enableAutoSync()">
-				Automatically sync every hour
-			</button>
-			<button type="button" onclick="disableAutoSync()">
-				Disable automatic syncing
-			</button>
-			<p id="status"></p>
-			<div id="lastRunResults"></div>
+    <div class="help">
+      <h1>How does this work?</h1>
+      <p>
+        Amtrak2Calendar scans your GMail account for Amtrak reservations, and
+        adds corresponding events to your calendar automatically. This is
+        intended to be like what GMail already does for airline reservations, but
+        for Amtrak, which isn't directly supported.
+      </p>
+      <h1>Okay, sync my Amtrak trains.</h1>
+      <p>
+        To try it out, click one of the "Sync now" or "Enable auto-sync" buttons.
+      </p>
+      <h1>Auto-sync?</h1>
+      <p>
+        Once you enable auto-sync, then you're all set. You don't need to visit
+        this page again. Amtrak2Calendar will continue to add events to your
+        calendar whenever you make a new Amtrak reservation.
+      </p>
+      <p>
+        When auto-sync is enabled, Amtrak2Calendar runs hourly. This means you
+        won't see your newly-purchased Amtrak reservation in your calendar until
+        the next time the script runs. If you'd like to see it immediately, you
+        can click the button labeled "Sync now."
+      </p>
+      <h1>I changed my mind, turn it off.</h1>
+      <p>
+        No problem. Click the "disable automatic syncing" button.
+      </p>
+      <p>
+        If you want to remove Amtrak2Calendar's access to your Google account,
+        go to <a href="https://myaccount.google.com/permissions">your security
+        page</a> and remove Amtrak2Calendar's access. Trains will stop being
+        synced. If you have privacy concerns, please
+        <a href="https://github.com/jrunningen/amtrak2calendar/issues/new">file an issue</a>.
+      </p>
+    </div>
+    <div class="controls">
+      <h1>Syncing</h1>
+      <button type="button" onclick="syncNow()">
+        Sync now
+      </button>
+      <p>
+        Auto-sync is currently
+        <strong><span id="autoSyncStatus"> ... </span></strong>.
+      </p>
+      <button type="button" onclick="enableAutoSync()">
+        Automatically sync every hour
+      </button>
+      <button type="button" onclick="disableAutoSync()">
+        Disable automatic syncing
+      </button>
+      <p id="status"></p>
+      <div id="lastRunResults"></div>
 
-			<h1>Calendar selection</h1>
-			<p>
-				Amtrak train reservations will be synced to calendar:
-				<strong><span id="selectedCalendarName"><?= selectedCalendar.name ?></span></strong>
-			</p>
-			<p>To use a different calendar, click one of the following buttons:</p>
-				<? calendars.forEach(function(calendar){ ?>
-					<button type="button" class="calendar-button" onclick="selectNewCalendar(<?= calendar.id ?>, <?= calendar.name ?>)">
-						<?= calendar.name ?>
-					</button>
-				<? }) ?>
-		</div>
+      <h1>Calendar selection</h1>
+      <p>
+        Amtrak train reservations will be synced to calendar:
+        <strong><span id="selectedCalendarName"><?= selectedCalendar.name ?></span></strong>
+      </p>
+      <p>To use a different calendar, click one of the following buttons:</p>
+        <? calendars.forEach(function(calendar){ ?>
+          <button type="button" class="calendar-button" onclick="selectNewCalendar(<?= calendar.id ?>, <?= calendar.name ?>)">
+            <?= calendar.name ?>
+          </button>
+        <? }) ?>
+    </div>
   </div>
 </body>
 
