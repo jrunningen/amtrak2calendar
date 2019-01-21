@@ -1,7 +1,7 @@
 Amtrak2Calendar
 ===============
 
-Amtrak2Calendar is a GMail add-on that helps you create Google Calendar
+Amtrak2Calendar is a Google Add-On that helps you create Google Calendar
 events from your Amtrak reservation emails.
 
 Amtrak2Calendar will scan your reservation e-mail and extract train
