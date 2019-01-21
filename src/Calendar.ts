@@ -101,7 +101,7 @@ export function createCalendarEvent(train: Train) {
     "\nCreated by Amtrak2Calendar"
   );
   event.addGuest(Session.getEffectiveUser().getEmail());
-  Logger.log("Created event %s", event.getId());
+  console.log("Created event %s", event.getId());
 }
 
 /**
@@ -126,14 +126,14 @@ export function removeTrainEvent(train: Train): Number {
 
   const eventCount = events.length;
   if (eventCount === 0) {
-    Logger.log(
+    console.log(
       "Didn't find any calendar events for reservation %s",
       train.reservationNumber
     );
   }
 
   events.forEach((event) => {
-    Logger.log(
+    console.log(
       "Deleting cancelled reservation %s: %s",
       train.reservationNumber,
       event

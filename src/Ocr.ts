@@ -28,7 +28,7 @@ export function ocrAttachment(attachment) {
     { ocr: true, ocrLanguage: "en" }
   );
 
-  Logger.log("Created file: %s", attachment.getName());
+  console.log("Created file: %s", attachment.getName());
 
   const doc = DocumentApp.openById(file.id);
   const text = doc.getBody().getText();

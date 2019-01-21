@@ -71,7 +71,7 @@ function isAutoSyncEnabled() {
  */
 function createAutoSyncTrigger() {
   removeAllTriggers();
-	Logger.log("Creating a trigger");
+	console.log("Creating a trigger");
   ScriptApp.newTrigger('autoSync')
       .timeBased()
       .everyHours(1)
@@ -107,11 +107,11 @@ function autoSync() {
     cancelledReservationNumbers.push(reservationNumber);
   });
 
-  Logger.log("Fetching Amtrak emails");
+  console.log("Fetching Amtrak emails");
   const threads = GmailApp.search(
     `from:etickets@amtrak.com subject:"eticket and receipt for your" newer_than:${SEARCH_RANGE}`
   );
-  Logger.log("Got %s threads", threads.length);
+  console.log("Got %s threads", threads.length);
 
   // Information returned to the caller.
   const reservationsFound = [];
@@ -137,12 +137,12 @@ function autoSync() {
         // sync the absent one. Check the message body text for being a one-way
         // or round-trip ticket, and try to detect this situation.
         if (cancelledReservationNumbers.indexOf(reservationNumber) !== -1) {
-          Logger.log(
+          console.log(
             "Reservation %s has been cancelled",
             reservationNumber
           );
           for (const event of reservationCalendarEvents) {
-            Logger.log(
+            console.log(
               "Deleting cancelled reservation %s: %s",
               reservationNumber,
               event
@@ -152,12 +152,12 @@ function autoSync() {
         }
       }
 
-      Logger.log("Reading message for reservation number %s", reservationNumber);
+      console.log("Reading message for reservation number %s", reservationNumber);
 
       const attachment = message.getAttachments()[0];
       const ticketText = ocrAttachment(attachment);
       if (ticketText === null) {
-        Logger.log(`Failed to parse ticket for reservation ${messageBodyTrains[0].reservationNumber}`);
+        console.log(`Failed to parse ticket for reservation ${messageBodyTrains[0].reservationNumber}`);
         reservationsFailed.push(reservationNumber);
         continue;
       }
@@ -168,14 +168,14 @@ function autoSync() {
       try {
         const trains = Train.FromOcrText(ticketText);
       } catch (error) {
-        Logger.log("Failed to parse reservation " + reservationNumber + ": " + error)
+        console.log("Failed to parse reservation " + reservationNumber + ": " + error)
         reservationsFailed.push(reservationNumber);
         continue;
       }
 
       for (const train of trains) {
-        Logger.log("  Train: %s", train.train);
-        Logger.log(
+        console.log("  Train: %s", train.train);
+        console.log(
           "Depart %s, arrive %s",
           train.depart.toDate(),
           train.arrive.toDate()
