@@ -9,7 +9,7 @@ information, like departure and arrival time, and create calendar events
 accordingly on your Google Calendar. This emulates what GMail normally does
 for airline tickets, dinner reservations, and so on.
 
-How to Use
+How to use
 ==========
 
 Amtrak2Calendar is not yet available in the G Suite Marketplace - I need some
