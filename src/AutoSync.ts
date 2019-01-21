@@ -71,7 +71,6 @@ function isAutoSyncEnabled() {
  */
 function createAutoSyncTrigger() {
   removeAllTriggers();
-	console.log("Creating a trigger");
   ScriptApp.newTrigger('autoSync')
       .timeBased()
       .everyHours(1)
@@ -96,6 +95,10 @@ function removeAllTriggers() {
  * automatically, like with Gmail's native support for airline reservations.
  */
 function autoSync() {
+	// Log a blank message, so I can verify that Stackdriver Logging works during
+	// normal operation.
+  console.log();
+
   // Remove Cancellations from Calendar
   const cancellationThreads = GmailApp.search(
     `from:etickets@amtrak.com "reservation canceled" newer_than:${SEARCH_RANGE}`
@@ -107,11 +110,9 @@ function autoSync() {
     cancelledReservationNumbers.push(reservationNumber);
   });
 
-  console.log("Fetching Amtrak emails");
   const threads = GmailApp.search(
     `from:etickets@amtrak.com subject:"eticket and receipt for your" newer_than:${SEARCH_RANGE}`
   );
-  console.log("Got %s threads", threads.length);
 
   // Information returned to the caller.
   const reservationsFound = [];
@@ -137,27 +138,15 @@ function autoSync() {
         // sync the absent one. Check the message body text for being a one-way
         // or round-trip ticket, and try to detect this situation.
         if (cancelledReservationNumbers.indexOf(reservationNumber) !== -1) {
-          console.log(
-            "Reservation %s has been cancelled",
-            reservationNumber
-          );
           for (const event of reservationCalendarEvents) {
-            console.log(
-              "Deleting cancelled reservation %s: %s",
-              reservationNumber,
-              event
-            );
             event.deleteEvent();
           }
         }
       }
 
-      console.log("Reading message for reservation number %s", reservationNumber);
-
       const attachment = message.getAttachments()[0];
       const ticketText = ocrAttachment(attachment);
       if (ticketText === null) {
-        console.log(`Failed to parse ticket for reservation ${messageBodyTrains[0].reservationNumber}`);
         reservationsFailed.push(reservationNumber);
         continue;
       }
@@ -168,19 +157,11 @@ function autoSync() {
       try {
         const trains = Train.FromOcrText(ticketText);
       } catch (error) {
-        console.log("Failed to parse reservation " + reservationNumber + ": " + error)
         reservationsFailed.push(reservationNumber);
         continue;
       }
 
       for (const train of trains) {
-        console.log("  Train: %s", train.train);
-        console.log(
-          "Depart %s, arrive %s",
-          train.depart.toDate(),
-          train.arrive.toDate()
-        );
-
         if(syncCalendarEvent(train)) {
           trainsSynced.push(train.description);
         }
