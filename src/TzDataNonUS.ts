@@ -5,7 +5,7 @@
 // There don't seem to be any in Mexico. The entries here are from poking around
 // on amtrak.com and amtrakvacations.com.
 
-export const tzDataNonUs = {
+const tzDataNonUs = {
   VAC: 'America/Vancouver',
   MTR: 'America/Toronto',
   SLQ: 'America/Toronto',
