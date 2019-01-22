@@ -3,6 +3,14 @@ import { stationToTimeZone } from "./TzData"
 
 const DATE_FORMAT = "ddd, MMM D YYYY, h:mm A z";
 
+export function getReservationNumber(messageBody) {
+  const match = messageBody.match("Reservation Number - ([A-Z0-9]+)");
+  if (match == null) {
+    return null;
+  }
+  return match[1];
+}
+
 function ocrRegexp(): RegExp {
   const regexpParts: RegExp[] = [
     // Train and train number.
@@ -192,6 +200,69 @@ export class Train {
       destinationStation: this.destinationStation,
       reservationNumber: this.reservationNumber,
       trainName: this.train,
+    };
+  }
+}
+
+/**
+ * An IncompleteTrain lacks some information, like 3-letter station codes and
+ * arrival time. Its information is extracted from email message bodies.
+ *
+ * Departure time is not timezone-aware.
+ */
+export class IncompleteTrain {
+  // Train number and human-readable stations. Example:
+  // Train 173: NEW YORK (PENN STATION), NY - WASHINGTON, DC
+  public name: string;
+  public reservationNumber: string;
+  // Not timezone-aware.
+  public depart: moment.Moment; 
+
+  constructor(
+    name: string,
+    reservationNumber: string,
+    depart: moment.Moment,
+  ) {
+    this.reservationNumber = reservationNumber;
+    this.name = name;
+    this.depart = depart;
+  }
+
+  public static FromGmailMessage(messageBody): IncompleteTrain[] {
+    const reservationNumber = getReservationNumber(messageBody);
+    const re = /ChangeSummaryTrainInfo">(Train [^<]+)<\/span><span .*?ChangeSummaryDepart">Depart (.*?)</g;
+    let match;
+    const trains: IncompleteTrain[] = [];
+    do {
+      match = re.exec(messageBody);
+      if (match) {
+        // FIXME: Get the departure station from the message body, if possible.
+        const depart = moment(match[2], "hh:mm a, ddd, MMMM DD YYYY");
+        // Arrival time is not available from email message bodies. Use 1 hour as a placeholder.
+        const arrive = depart.clone().add(1, "hour");
+        const trainName = match[1];
+        const train = new IncompleteTrain(
+          trainName,
+          reservationNumber,
+          depart,
+        );
+        trains.push(train);
+      }
+    } while (match);
+
+    return trains;
+  }
+
+  /**
+   * Return a dict representing this train, so it can be stored in callback params and rebuilt in a callback.
+   *
+   * Train.FromParams(train.toParams()) === train.
+   */
+  public toParams() {
+    return {
+      depart: this.depart.format(),
+      name: this.name,
+      reservationNumber: this.reservationNumber,
     };
   }
 }

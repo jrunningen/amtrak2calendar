@@ -1,7 +1,8 @@
 import { readFileSync } from "fs";
 import * as moment from "moment-timezone";
 import { join } from "path";
-import { Train } from "../src/Train";
+import { IncompleteTrain, Train } from "../src/Train";
+import { ezDate } from "./support/Util";
 
 function trainEquality(train: Train) {
   return {
@@ -12,10 +13,6 @@ function trainEquality(train: Train) {
       return `<trainEquality: ${train}`;
     }
   }
-}
-
-function ezDate(date: string) {
-  return moment(date, "YYYY-MM-DD HH:mm Z");
 }
 
 describe("Train", () => {
@@ -311,6 +308,31 @@ describe("Train", () => {
     for (const file of testCases.keys()) {
       const ticketText = readFileSync(join(testdataPath, file), "utf8");
       const trains: Train[] = Train.FromOcrText(ticketText);
+      expect(trains).toEqual(testCases.get(file));
+    }
+  });
+  it("reads trains from emails", () => {
+    const testCases = new Map([
+      [
+        "email text 1.txt",
+        [
+          new IncompleteTrain(
+            "Train 173: NEW YORK (PENN STATION), NY - WASHINGTON, DC",
+            "1D4433",
+            ezDate("2019-01-11 15:35")
+          ),
+          new IncompleteTrain(
+            "Train 158: WASHINGTON, DC - NEW YORK (PENN STATION), NY",
+            "1D4433",
+            ezDate("2019-01-13 18:20")
+          ),
+        ],
+      ],
+    ]);
+    const testdataPath = "spec/testdata";
+    for (const file of testCases.keys()) {
+      const messageText = readFileSync(join(testdataPath, file), "utf8");
+      const trains: IncompleteTrain[] = IncompleteTrain.FromGmailMessage(messageText);
       expect(trains).toEqual(testCases.get(file));
     }
   });
