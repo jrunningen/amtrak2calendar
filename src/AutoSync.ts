@@ -4,7 +4,7 @@
 import * as moment from "moment";
 import { syncCalendarEvent, getCalendar, getTrainCalendarEvents, getReservationCalendarEvents} from "./Calendar";
 import { ocrAttachment } from "./Ocr";
-import { Train } from "./Train";
+import { IncompleteTrain, Train, getReservationNumber } from "./Train";
 import { stationToTimeZone } from "./TzData";
 import { fail } from "assert";
 
@@ -17,23 +17,6 @@ const SEARCH_RANGE = '6m';
  */
 function doGet() {
   const template = HtmlService.createTemplateFromFile('Index');
-  const template.isAutoSyncEnabled = false
-
-  const calendars = CalendarApp.getAllOwnedCalendars();
-  template.calendars = [];
-  for (const calendar of calendars) {
-    template.calendars.push({
-      name: calendar.getName(),
-      id: calendar.getId(),
-    })
-  }
-
-  const selectedCalendar = getCalendar();
-  template.selectedCalendar = {
-    name: selectedCalendar.getName(),
-    id: selectedCalendar.getId(),
-  }
-
   return template.evaluate();
 }
 
@@ -95,10 +78,6 @@ function removeAllTriggers() {
  * automatically, like with Gmail's native support for airline reservations.
  */
 function autoSync() {
-	// Log a blank message, so I can verify that Stackdriver Logging works during
-	// normal operation.
-  console.log();
-
   // Remove Cancellations from Calendar
   const cancellationThreads = GmailApp.search(
     `from:etickets@amtrak.com "reservation canceled" newer_than:${SEARCH_RANGE}`
@@ -163,7 +142,7 @@ function autoSync() {
 
       for (const train of trains) {
         if(syncCalendarEvent(train)) {
-          trainsSynced.push(train.description);
+          trainsSynced.push(train.toParams());
         }
       };
     };
@@ -177,47 +156,46 @@ function autoSync() {
   };
 }
 
-function getReservationNumber(messageBody) {
-  const match = messageBody.match("Reservation Number - ([A-Z0-9]+)");
-  if (match == null) {
-    return null;
-  }
-  return match[1];
-}
-
-export function getTrainsFromMessageBody(messageBody: string): Train[] {
-  const reservationNumber = getReservationNumber(messageBody);
-  const re = /ChangeSummaryTrainInfo">(Train [^<]+)<\/span><span .*?ChangeSummaryDepart">Depart (.*?)</g;
-  let match;
-  const trains: Train[] = [];
-  do {
-    match = re.exec(messageBody);
-    if (match) {
-      // FIXME: Get the departure station from the message body, if possible.
-      const depart = moment.tz(match[2], "hh:mm a, ddd, MMMM DD YYYY", stationToTimeZone("NYP"));
-      // Arrival time is not available from email message bodies. Use 1 hour as a placeholder.
-      const arrive = depart.clone().add(1, "hour");
-      const trainName = match[1];
-      const train = new Train(
-        trainName,
-        "???",
-        "???",
-        reservationNumber,
-        depart,
-        arrive
-      );
-      trains.push(train);
-    }
-  } while (match);
-
-  return trains;
-}
-
 /**
- * Get all trains from a single reservation message.
+ * Gets all the information we can from Gmail without reading OCR or changing
+ * anything. This populates the list of trains the user sees on the main page.
  *
- * @param message
- * @param cancelledReservationNumbers
+ * FIXME: This code is duplicated in autoSync(). Refactor it so that this
+ * function can be called first in autoSync(), retaining the context of
+ * associating trains with their gmail messages and attachments.
  */
-function getTrains(message, cancelledReservationNumbers) {
+function getTrainsFromGmail() {
+  // Remove Cancellations from Calendar
+  const cancellationThreads = GmailApp.search(
+    `from:etickets@amtrak.com "reservation canceled" newer_than:${SEARCH_RANGE}`
+  );
+  const cancelledReservationNumbers = [];
+  cancellationThreads.forEach((thread) => {
+    const message = thread.getMessages()[0];
+    const reservationNumber = getReservationNumber(message.getBody());
+    cancelledReservationNumbers.push(reservationNumber);
+  });
+
+  const threads = GmailApp.search(
+    `from:etickets@amtrak.com subject:"eticket and receipt for your" newer_than:${SEARCH_RANGE}`
+  );
+
+  const trains = [];
+
+  for (const thread of threads) {
+    for (const message of thread.getMessages()) {
+      // Checking the message body is cheaper than OCRing text. Scan the email for
+      // trains that should be synced. If we don't find any, we can skip the OCR.
+      const messageBody = message.getBody();
+      const reservationNumber = getReservationNumber(messageBody);
+      if (cancelledReservationNumbers.indexOf(reservationNumber) !== -1) {
+        continue;
+      }
+      const messageTrains: IncompleteTrain[] = IncompleteTrain.FromGmailMessage(messageBody);
+      for (const train of messageTrains) {
+        trains.push(train.toParams());
+      }
+    }
+  }
+  return trains;
 }

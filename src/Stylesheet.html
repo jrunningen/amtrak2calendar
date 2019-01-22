@@ -23,8 +23,12 @@ div.nav-text {
 
 nav a {
   padding: 10px;
-  color: white;
+  color: cornsilk;
   text-decoration: none;
+}
+
+nav a:hover {
+  color: salmon;
 }
 
 .hero {
@@ -43,40 +47,84 @@ nav a {
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
-  text-shadow: 1px 1px 0 #000;
+  text-shadow: 2px 2px 0 black;
   font-size: 2em;
+}
+
+/* Keep hero text in the page on smaller screens. */
+@media screen and (max-width: 650px) {
+  .hero-text {
+    font-size: 1em;
+  }
 }
 
 /* Main */
 
 .container {
   margin: auto;
-  background: white;
   max-width: 960px;
-	display: flex;
-	flex-flow: row wrap;
+  padding: 5px;
+}
+
+.flex {
+  display: flex;
+  flex-flow: row wrap;
+  /* 5px margin between elements only.
+   * https://stackoverflow.com/questions/20626685/better-way-to-set-distance-between-flexbox-items
+   */
+  margin: 0 -5px;
+}
+
+.flex div {
+  /* 5px margin between elements only.
+   * https://stackoverflow.com/questions/20626685/better-way-to-set-distance-between-flexbox-items
+   */
+  margin: 0 5px;
 }
 
 div.help {
- flex: 2 300px;
- margin: 10px;
+  flex: 2 300px;
 }
 
 div.controls {
- flex: 1 300px;
- margin: 10px;
+  flex: 1 300px;
 }
 
 /* Buttons */
 
 button {
-  background: #0a70d0;
+  background: dodgerblue;
   border: none;
   border-radius: 5px;
   padding: 8px 14px;
   font-size: 15px;
-  color: #fff;
-	width: 100%;
-	margin: 2px;
+  color: white;
+  width: 100%;
+  margin: 2px;
+}
+
+button:hover {
+  background: deepskyblue;
+}
+
+/* Train list */
+
+div.train-list-item {
+  width: 100%;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+div.train-list-item span {
+  padding: 5px;
+  flex: 1
+}
+
+div.train-list-item:nth-of-type(odd) {
+  background: whitesmoke;
+}
+
+div.train-list-item:nth-of-type(even) {
+  background: ghostwhite;
 }
 </style>

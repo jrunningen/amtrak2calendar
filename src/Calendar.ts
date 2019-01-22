@@ -23,6 +23,10 @@ export function getCalendar() {
   return activeCalendar;
 }
 
+export function getCalendarName() {
+  return getCalendar().getName();
+}
+
 /**
  * Get the calendar ID.
  */
@@ -61,6 +65,18 @@ export function getTrainCalendarEvents(train: Train) {
       .toDate(),
     { search: "Amtrak2Calendar " + train.reservationNumber }
   );
+}
+
+export function getCalendarNamesAndIds() {
+  const calendars = CalendarApp.getAllOwnedCalendars();
+  const results = [];
+  for (const calendar of calendars) {
+    results.push({
+      name: calendar.getName(),
+      id: calendar.getId(),
+    })
+  }
+  return results;
 }
 
 export function getReservationCalendarEvents(reservationNumber: string) {

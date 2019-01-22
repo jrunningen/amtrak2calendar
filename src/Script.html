@@ -3,19 +3,21 @@
     $('#status').text(statusText);
   }
 
-  function finishedStatus(result) {
+  function finishedStatus() {
     setStatus("Finished!");
   }
 
-  function failedStatus() {
-    setStatus("Failed!");
+  function failedStatus(arg) {
+    console.log(arg);
+    setStatus(arg.toString());
   }
 
   function syncNow() {
     $('#status').text("Syncing...");
     google.script.run
       .withSuccessHandler((results) => {
-        finishedStatus(JSON.stringify(results));
+        console.log(results);
+        finishedStatus();
         displayLastRun(results);
       })
       .withFailureHandler(failedStatus)
@@ -85,7 +87,7 @@
       `);
       for (const reservation of results.reservationsFound) {
         $("#reservationsFound").append(`
-        <li>${reservation}</li>
+          <li>${reservation}</li>
         `);
       }
     }
@@ -111,5 +113,52 @@
     }
   }
 
+  /* Populate selected and available calendars. */
+  function getCalendars() {
+    google.script.run
+      .withSuccessHandler((selectedCalendarName) => {
+        $('#selectedCalendarName').text(selectedCalendarName);
+      })
+      .withFailureHandler(failedStatus)
+      .getCalendarName();
+
+    google.script.run
+      .withSuccessHandler((calendarNamesAndIds) => {
+        $('#calendarButtons').empty();
+        for (const calendar of calendarNamesAndIds) {
+          $('#calendarButtons').append(`
+            <button type="button" class="calendar-button" onclick="selectNewCalendar('${calendar.id}', '${calendar.name}')">
+              ${calendar.name}
+            </button>
+          `);
+        }
+      })
+      .withFailureHandler(failedStatus)
+      .getCalendarNamesAndIds();
+  }
+
+
+  /* Populate a list of reservations by reading Gmail */
+  function getReservations() {
+    google.script.run
+      .withSuccessHandler((trains) => {
+        console.log(trains);
+        $("#trainList").empty();
+        for (const train of trains) {
+          $("#trainList").append(`
+            <div class="train-list-item">
+            <span class="train-name">${train.name}</span>
+            <span class="train-depart">${train.depart}</span>
+            <span class="train-reservation-number">${train.reservationNumber}</span>
+            </div>
+          `);
+        }
+      })
+      .withFailureHandler(failedStatus)
+      .getTrainsFromGmail()
+  }
+
   getAutoSyncStatus();
+  getCalendars();
+  getReservations();
 </script>
