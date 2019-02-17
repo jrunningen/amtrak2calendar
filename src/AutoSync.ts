@@ -39,8 +39,8 @@ function include(filename) {
 function isAutoSyncEnabled() {
   const triggers = ScriptApp.getProjectTriggers();
   for (const trigger of triggers) {
-    if (trigger.getHandlerFunction === "autoSync" &&
-        trigger.getEventType() === ScriptApp.EventType.CLOCK) ) {
+    if (trigger.getHandlerFunction() === "autoSync" &&
+        trigger.getEventType() === ScriptApp.EventType.CLOCK) {
           return true;
     }
   }
@@ -130,11 +130,12 @@ function autoSync() {
         continue;
       }
 
+      let trains: Train[] = [];
       // FIXME: There's room for improvement in the logic here. This will sync both
       // trains in a round trip, even if one already has a calendar event, possibly
       // resulting in duplicate reservations.
       try {
-        const trains = Train.FromOcrText(ticketText);
+        trains = Train.FromOcrText(ticketText);
       } catch (error) {
         reservationsFailed.push(reservationNumber);
         continue;
