@@ -27,5 +27,8 @@
   "prettier": {
     "trailingComma": "es5",
     "arrowParens": "always"
+  },
+  "dependencies": {
+    "@types/google-apps-script": "0.0.37"
   }
 }
