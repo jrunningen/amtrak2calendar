@@ -18,7 +18,30 @@
  * @param attachment A GmailAttachment
  * (https://developers.google.com/apps-script/reference/gmail/gmail-attachment)
  */
-export function ocrAttachment(attachment) {
+
+/**
+ * These are minimal type definitions for the parts of the Drive Advanced
+ * Service that I use. It doesn't look like proper type definitions are
+ * publicly available.
+ *
+ * https://developers.google.com/apps-script/advanced/drive
+ */
+export interface FileInterface {
+  id: string;
+}
+export interface FilesInterface {
+  insert(metadata: object, contents: object, options: object): FileInterface;
+  trash(fileId: string);
+}
+export interface GoogleDriveAdvancedService {
+  Files: FilesInterface;
+}
+declare var Drive: GoogleDriveAdvancedService;
+
+/**
+ * Extracts the OCR text from a PDF ticket attachment.
+ */
+export function ocrAttachment(attachment): string {
   const file = Drive.Files.insert(
     {
       mimeType: attachment.getContentType(),
