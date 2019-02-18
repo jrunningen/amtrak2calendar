@@ -73,6 +73,28 @@ function removeAllTriggers() {
 }
 
 /**
+ * Gets emails releted to Amtrak reservations.
+ */
+function getReservationThreads(): GoogleAppsScript.Gmail.GmailThread[] {
+  return GmailApp.search(
+    `from:etickets@amtrak.com subject:"eticket and receipt for your" newer_than:${SEARCH_RANGE}`
+  );
+}
+
+/**
+ * Gets emails releted to Amtrak cancellations.
+ */
+function getCancellationThreads(): GoogleAppsScript.Gmail.GmailThread[] {
+  return GmailApp.search(
+    `from:etickets@amtrak.com "reservation canceled" newer_than:${SEARCH_RANGE}`
+  );
+}
+
+function getCancelledReservationNumbers(): string[] {
+  return getCancellationThreads().map((thread) => getReservationNumber(thread.getMessages()[0]));
+}
+
+/**
  * Scan the user's Gmail inbox, and sync all future Amtrak reservations to the calendar.
  *
  * This function is intended to be called as a recurring trigger, so the user
@@ -80,20 +102,9 @@ function removeAllTriggers() {
  * automatically, like with Gmail's native support for airline reservations.
  */
 function autoSync() {
-  // Remove Cancellations from Calendar
-  const cancellationThreads = GmailApp.search(
-    `from:etickets@amtrak.com "reservation canceled" newer_than:${SEARCH_RANGE}`
-  );
-  const cancelledReservationNumbers = [];
-  cancellationThreads.forEach((thread) => {
-    const message = thread.getMessages()[0];
-    const reservationNumber = getReservationNumber(message.getBody());
-    cancelledReservationNumbers.push(reservationNumber);
-  });
-
-  const threads = GmailApp.search(
-    `from:etickets@amtrak.com subject:"eticket and receipt for your" newer_than:${SEARCH_RANGE}`
-  );
+  // Remove cancellations from Calendar
+  const cancelledReservationNumbers = getCancelledReservationNumbers();
+  const reservationThreads = getReservationThreads();
 
   // Information returned to the caller.
   const reservationsFound = [];
@@ -101,8 +112,8 @@ function autoSync() {
   const reservationsFailed = [];
   const reservationsAlreadyPresent = [];
 
-  for (const thread of threads) {
-    for (const message of thread.getMessages()) {
+  for (const reservationThread of reservationThreads) {
+    for (const message of reservationThread.getMessages()) {
       // Checking the message body is cheaper than OCRing text. Scan the email for
       // trains that should be synced. If we don't find any, we can skip the OCR.
       const messageBody = message.getBody();
@@ -169,20 +180,8 @@ function autoSync() {
  */
 function getReservationsFromGmail() {
   // Remove Cancellations from Calendar
-  const cancellationThreads = GmailApp.search(
-    `from:etickets@amtrak.com "reservation canceled" newer_than:${SEARCH_RANGE}`
-  );
-  const cancelledReservationNumbers = [];
-  cancellationThreads.forEach((thread) => {
-    const message = thread.getMessages()[0];
-    const reservationNumber = getReservationNumber(message.getBody());
-    cancelledReservationNumbers.push(reservationNumber);
-  });
-
-  const threads = GmailApp.search(
-    `from:etickets@amtrak.com subject:"eticket and receipt for your" newer_than:${SEARCH_RANGE}`
-  );
-
+  const cancelledReservationNumbers = getCancelledReservationNumbers();
+  const threads = getReservationThreads();
   const reservations = [];
 
   for (const thread of threads) {
