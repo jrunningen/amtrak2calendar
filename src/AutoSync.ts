@@ -4,7 +4,9 @@
 import * as moment from "moment";
 import { syncCalendarEvent, getCalendar, getTrainCalendarEvents, getReservationCalendarEvents} from "./Calendar";
 import { ocrAttachment } from "./Ocr";
-import { IncompleteTrain, Train, getReservationNumber } from "./Train";
+import { IncompleteTrain, Train } from "./Train";
+import { Reservation } from "./Reservation";
+import { getReservationNumber } from "./Reservation";
 import { stationToTimeZone } from "./TzData";
 import { fail } from "assert";
 
@@ -165,7 +167,7 @@ function autoSync() {
  * function can be called first in autoSync(), retaining the context of
  * associating trains with their gmail messages and attachments.
  */
-function getTrainsFromGmail() {
+function getReservationsFromGmail() {
   // Remove Cancellations from Calendar
   const cancellationThreads = GmailApp.search(
     `from:etickets@amtrak.com "reservation canceled" newer_than:${SEARCH_RANGE}`
@@ -181,22 +183,21 @@ function getTrainsFromGmail() {
     `from:etickets@amtrak.com subject:"eticket and receipt for your" newer_than:${SEARCH_RANGE}`
   );
 
-  const trains = [];
+  const reservations = [];
 
   for (const thread of threads) {
     for (const message of thread.getMessages()) {
       // Checking the message body is cheaper than OCRing text. Scan the email for
       // trains that should be synced. If we don't find any, we can skip the OCR.
       const messageBody = message.getBody();
-      const reservationNumber = getReservationNumber(messageBody);
-      if (cancelledReservationNumbers.indexOf(reservationNumber) !== -1) {
-        continue;
+      const reservation = Reservation.FromGmailMessage(messageBody);
+
+      if (cancelledReservationNumbers.indexOf(reservation.reservationNumber) !== -1) {
+        reservation.isCancelled = true;
       }
-      const messageTrains: IncompleteTrain[] = IncompleteTrain.FromGmailMessage(messageBody);
-      for (const train of messageTrains) {
-        trains.push(train.toParams());
-      }
+
+      reservations.push(reservation.toDisplayObject());
     }
   }
-  return trains;
+  return reservations;
 }

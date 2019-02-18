@@ -3,14 +3,6 @@ import { stationToTimeZone } from "./TzData"
 
 const DATE_FORMAT = "ddd, MMM D YYYY, h:mm A z";
 
-export function getReservationNumber(messageBody) {
-  const match = messageBody.match("Reservation Number - ([A-Z0-9]+)");
-  if (match == null) {
-    return null;
-  }
-  return match[1];
-}
-
 function ocrRegexp(): RegExp {
   const regexpParts: RegExp[] = [
     // Train and train number.
@@ -46,7 +38,94 @@ function ocrRegexp(): RegExp {
   );
 }
 
-export class Train {
+/**
+ * An IncompleteTrain lacks some information, like 3-letter station codes and
+ * arrival time. Its information is extracted from email message bodies.
+ *
+ * Departure time is not timezone-aware.
+ */
+export class IncompleteTrain {
+  /**
+   * Parse all trains found in a Gmail message. This does not do OCR scanning,
+   * and should be a bit faster, but can get less information thank
+   * Train.FromOcrText.
+   */
+  public static FromGmailMessage(messageBody): IncompleteTrain[] {
+    const re = /ChangeSummaryTrainInfo">(Train [^<]+)<\/span><span .*?ChangeSummaryDepart">Depart (.*?)</g;
+    let match;
+    const trains: IncompleteTrain[] = [];
+    do {
+      match = re.exec(messageBody);
+      if (match) {
+        // FIXME: Get the departure station from the message body, if possible.
+        const depart = moment(match[2], "hh:mm a, ddd, MMMM DD YYYY");
+        // Arrival time is not available from email message bodies. Use 1 hour as a placeholder.
+        const arrive = depart.clone().add(1, "hour");
+        const trainName = match[1];
+        const train = new IncompleteTrain(
+          trainName,
+          depart,
+        );
+        trains.push(train);
+      }
+    } while (match);
+
+    return trains;
+  }
+
+  // Train number and human-readable stations. Example:
+  // Train 173: NEW YORK (PENN STATION), NY - WASHINGTON, DC
+  public name: string;
+  // Not timezone-aware.
+  public depart: moment.Moment; 
+
+  public get trainNumber() {
+    const match = this.name.match("Train ([0-9]+):");
+    if (match == null) {
+      return '???';
+    }
+    return match[1];
+  }
+
+  public get departStationName() {
+    const match = this.name.match(":(.*) - ");
+    if (match == null) {
+      return '???';
+    }
+    return match[1].trim();
+  }
+
+  public get arriveStationName() {
+    const match = this.name.match(" - (.*)");
+    if (match == null) {
+      return '???';
+    }
+    return match[1].trim();
+  }
+
+  constructor(
+    name: string,
+    depart: moment.Moment,
+  ) {
+    this.name = name;
+    this.depart = depart;
+  }
+
+  /**
+   * Return a dict of display-formatted strings representing this train, so it can be shown in the web UI.
+   *
+   * Train.FromParams(train.toParams()) === train.
+   */
+  public toDisplayObject() {
+    return {
+      depart: this.depart.format(DATE_FORMAT),
+      name: this.name,
+    };
+  }
+}
+
+
+export class Train extends IncompleteTrain {
   public static FromParams(params: any): Train {
     return new Train(
       params.trainName,
@@ -136,8 +215,9 @@ export class Train {
   // FIXME: Build in default behavior when arrival time is unset.
   public train: string; // Stores the train number.
   public originStation: string;
-  public destinationStation: string;
+  // FIXME: Remove.
   public reservationNumber: string;
+  public destinationStation: string;
   public depart: moment.Moment;
   public arrive: moment.Moment;
 
@@ -150,6 +230,7 @@ export class Train {
     depart: moment.Moment,
     arrive: moment.Moment
   ) {
+    super(trainName, depart);
     this.arrive = arrive.tz(stationToTimeZone(destinationStation));
     this.depart = depart.tz(stationToTimeZone(originStation));
     this.reservationNumber = reservationNumber;
@@ -204,65 +285,3 @@ export class Train {
   }
 }
 
-/**
- * An IncompleteTrain lacks some information, like 3-letter station codes and
- * arrival time. Its information is extracted from email message bodies.
- *
- * Departure time is not timezone-aware.
- */
-export class IncompleteTrain {
-  // Train number and human-readable stations. Example:
-  // Train 173: NEW YORK (PENN STATION), NY - WASHINGTON, DC
-  public name: string;
-  public reservationNumber: string;
-  // Not timezone-aware.
-  public depart: moment.Moment; 
-
-  constructor(
-    name: string,
-    reservationNumber: string,
-    depart: moment.Moment,
-  ) {
-    this.reservationNumber = reservationNumber;
-    this.name = name;
-    this.depart = depart;
-  }
-
-  public static FromGmailMessage(messageBody): IncompleteTrain[] {
-    const reservationNumber = getReservationNumber(messageBody);
-    const re = /ChangeSummaryTrainInfo">(Train [^<]+)<\/span><span .*?ChangeSummaryDepart">Depart (.*?)</g;
-    let match;
-    const trains: IncompleteTrain[] = [];
-    do {
-      match = re.exec(messageBody);
-      if (match) {
-        // FIXME: Get the departure station from the message body, if possible.
-        const depart = moment(match[2], "hh:mm a, ddd, MMMM DD YYYY");
-        // Arrival time is not available from email message bodies. Use 1 hour as a placeholder.
-        const arrive = depart.clone().add(1, "hour");
-        const trainName = match[1];
-        const train = new IncompleteTrain(
-          trainName,
-          reservationNumber,
-          depart,
-        );
-        trains.push(train);
-      }
-    } while (match);
-
-    return trains;
-  }
-
-  /**
-   * Return a dict representing this train, so it can be stored in callback params and rebuilt in a callback.
-   *
-   * Train.FromParams(train.toParams()) === train.
-   */
-  public toParams() {
-    return {
-      depart: this.depart.format(),
-      name: this.name,
-      reservationNumber: this.reservationNumber,
-    };
-  }
-}

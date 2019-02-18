@@ -2,30 +2,13 @@ import { readFileSync } from "fs";
 import * as moment from "moment-timezone";
 import { join } from "path";
 import { IncompleteTrain, Train } from "../src/Train";
-import { ezDate } from "./support/Util";
-
-function trainEquality(train: Train) {
-  return {
-    asymmetricMatch(compareTo: Train) {
-      return true;
-    },
-    jasmineToString() {
-      return `<trainEquality: ${train}`;
-    }
-  }
-}
+import { ezDate, momentEqualityTester } from "./support/Util";
 
 describe("Train", () => {
   beforeEach(() => {
-    // Add a custom equality for moments. Moments don't directly compare well --
-    // I get inequality on the _tzm attribute -- so we use the library's
-    // isSame() method.
-    jasmine.addCustomEqualityTester((first: any, second: any) => {
-      if (moment.isMoment(first) && moment.isMoment(second)) {
-        return first.isSame(second);
-      }
-    });
+    jasmine.addCustomEqualityTester(momentEqualityTester);
   });
+
   it("can be converted to and from event parameters", () => {
     // TODO(jrunningen): null attributes probably aren't handled well by GAS's
     // callback parameters. Check that.
@@ -311,29 +294,16 @@ describe("Train", () => {
       expect(trains).toEqual(testCases.get(file));
     }
   });
-  it("reads trains from emails", () => {
-    const testCases = new Map([
-      [
-        "email text 1.txt",
-        [
-          new IncompleteTrain(
-            "Train 173: NEW YORK (PENN STATION), NY - WASHINGTON, DC",
-            "1D4433",
-            ezDate("2019-01-11 15:35")
-          ),
-          new IncompleteTrain(
-            "Train 158: WASHINGTON, DC - NEW YORK (PENN STATION), NY",
-            "1D4433",
-            ezDate("2019-01-13 18:20")
-          ),
-        ],
-      ],
-    ]);
-    const testdataPath = "spec/testdata";
-    for (const file of testCases.keys()) {
-      const messageText = readFileSync(join(testdataPath, file), "utf8");
-      const trains: IncompleteTrain[] = IncompleteTrain.FromGmailMessage(messageText);
-      expect(trains).toEqual(testCases.get(file));
-    }
+});
+
+describe('IncompleteTrain', () => {
+  it('tries to parse the stations names from the title', () => {
+    const train = new IncompleteTrain(
+      "Train 173: NEW YORK (PENN STATION), NY - WASHINGTON, DC",
+      ezDate("2019-01-21 19:00 -0500"),
+    );
+    expect(train.trainNumber).toEqual('173');
+    expect(train.departStationName).toEqual('NEW YORK (PENN STATION), NY');
+    expect(train.arriveStationName).toEqual('WASHINGTON, DC');
   });
 });

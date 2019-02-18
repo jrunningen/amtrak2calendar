@@ -120,6 +120,10 @@ div.train-list-item span {
   flex: 1
 }
 
+div.reservation {
+  border-radius: 5px 5px;
+}
+
 div.train-list-item:nth-of-type(odd) {
   background: whitesmoke;
 }
@@ -127,4 +131,17 @@ div.train-list-item:nth-of-type(odd) {
 div.train-list-item:nth-of-type(even) {
   background: ghostwhite;
 }
+
+div.reservation-info {
+  padding: 5px;
+  border-radius: 5px 5px 0px 0px;
+  font-weight: bold;
+  background: steelblue;
+  color: whitesmoke;
+}
+
+div.cancelled-reservation div.reservation-info {
+  background: salmon;
+}
+
 </style>

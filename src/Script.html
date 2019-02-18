@@ -141,21 +141,34 @@
   /* Populate a list of reservations by reading Gmail */
   function getReservations() {
     google.script.run
-      .withSuccessHandler((trains) => {
-        console.log(trains);
+      .withSuccessHandler((reservations) => {
+        console.log(reservations);
         $("#trainList").empty();
-        for (const train of trains) {
-          $("#trainList").append(`
-            <div class="train-list-item">
-            <span class="train-name">${train.name}</span>
-            <span class="train-depart">${train.depart}</span>
-            <span class="train-reservation-number">${train.reservationNumber}</span>
+        for (const reservation of reservations) {
+          let reservationElement = $(`
+            <div class="reservation">
+              <div class="reservation-info">
+                Reservation <span class="reservation-number">${reservation.reservationNumber}</span>:
+                <span class="reservation-description">${reservation.description}</span>
+              </div>
             </div>
-          `);
+            `);
+          if (reservation.isCancelled) {
+            reservationElement.addClass("cancelled-reservation");
+          }
+          for (const train of reservation.trains) {
+            reservationElement.append(`
+              <div class="train-list-item">
+                <span class="train-name">${train.name}</span>
+                <span class="train-depart">${train.depart}</span>
+              </div>
+            `);
+          }
+          $("#trainList").append(reservationElement);
         }
       })
       .withFailureHandler(failedStatus)
-      .getTrainsFromGmail()
+      .getReservationsFromGmail()
   }
 
   getAutoSyncStatus();
