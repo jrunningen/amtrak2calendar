@@ -32,6 +32,19 @@ export interface FileInterface {
 export interface FilesInterface {
   insert(metadata: object, contents: object, options: object): FileInterface;
   trash(fileId: string);
+  // TODO(runningen): Call delete instead of trash, so we don't clutter the
+  // user's trash folder in Drive. It seems we can't do this yet, because we
+  // get an error:
+  //
+  // Cannot find function delete in object AdvancedServiceIdentifier{name=drive, version=v2}
+  //
+  // The documentation
+  // (https://developers.google.com/apps-script/guides/services/advanced) says
+  // that some Apps Script advanced services only provide a subset of the full
+  // functionality, so perhaps delete is missing. We could work around this by
+  // using the API directly with UrlFetch, but we'd have to set up the auth
+  // flow manually.
+  delete(fileId: string);
 }
 export interface GoogleDriveAdvancedService {
   Files: FilesInterface;
