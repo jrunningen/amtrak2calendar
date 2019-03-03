@@ -1,5 +1,5 @@
 import { readFileSync } from "fs";
-import { IncompleteTrain, Train } from "../src/Train";
+import { Train } from "../src/Train";
 import { Reservation } from "../src/Reservation";
 import { ezDate, momentEqualityTester } from "./support/Util";
 import { join } from "path";
@@ -16,13 +16,29 @@ describe("Reservation", () => {
         new Reservation(
           "1D4433",
           [
-            new IncompleteTrain(
+            Train.Incomplete(
               "Train 173: NEW YORK (PENN STATION), NY - WASHINGTON, DC",
-              ezDate("2019-01-11 15:35")
+              ezDate("2019-01-11 15:35"),
             ),
-            new IncompleteTrain(
+            Train.Incomplete(
               "Train 158: WASHINGTON, DC - NEW YORK (PENN STATION), NY",
-              ezDate("2019-01-13 18:20")
+              ezDate("2019-01-13 18:20"),
+            ),
+          ],
+        ),
+      ],
+      [
+        "email text 2.txt",
+        new Reservation(
+          "AEF964",
+          [
+            Train.Incomplete(
+              "Train 173: NEW YORK (PENN STATION), NY - WASHINGTON, DC",
+              ezDate("2018-10-17 16:05"),
+            ),
+            Train.Incomplete(
+              "Train 124: WASHINGTON, DC - NEW YORK (PENN STATION), NY",
+              ezDate("2018-10-21 19:10"),
             ),
           ],
         ),
@@ -48,7 +64,7 @@ describe("Reservation", () => {
         reservation: new Reservation(
           "1D4433",
           [
-            new IncompleteTrain(
+            Train.Incomplete(
               "Train 173: NEW YORK (PENN STATION), NY - WASHINGTON, DC",
               ezDate("2019-01-11 15:35")
             ),
@@ -59,11 +75,11 @@ describe("Reservation", () => {
         reservation: new Reservation(
           "1D4433",
           [
-            new IncompleteTrain(
+            Train.Incomplete(
               "Train 173: NEW YORK (PENN STATION), NY - WASHINGTON, DC",
               ezDate("2019-01-11 15:35")
             ),
-            new IncompleteTrain(
+            Train.Incomplete(
               "Train 158: WASHINGTON, DC - PHILADELPHIA",
               ezDate("2019-01-13 18:20")
             ),
@@ -74,15 +90,15 @@ describe("Reservation", () => {
         reservation: new Reservation(
           "1D4433",
           [
-            new IncompleteTrain(
+            Train.Incomplete(
               "Train 173: NEW YORK (PENN STATION), NY - WASHINGTON, DC",
               ezDate("2019-01-11 15:35")
             ),
-            new IncompleteTrain(
+            Train.Incomplete(
               "Train 158: WASHINGTON, DC - PHILADELPHIA",
               ezDate("2019-01-13 18:20")
             ),
-            new IncompleteTrain(
+            Train.Incomplete(
               "Train 158: PHILADELPHIA - SEATTLE",
               ezDate("2019-01-13 18:20")
             ),

@@ -53,7 +53,7 @@ export function setCalendarId(calendarId: string) {
  *
  * @param train The train.
  */
-export function getTrainCalendarEvents(train: Train) {
+export function getTrainCalendarEvents(train: Train, reservationNumber: string) {
   return getCalendar().getEvents(
     train.depart
       .clone()
@@ -63,7 +63,7 @@ export function getTrainCalendarEvents(train: Train) {
       .clone()
       .add(1, "day")
       .toDate(),
-    { search: "Amtrak2Calendar " + train.reservationNumber }
+    { search: "Amtrak2Calendar " + reservationNumber }
   );
 }
 

@@ -1,4 +1,4 @@
-import { IncompleteTrain } from "./Train";
+import { Train } from "./Train";
 
 export function getReservationNumber(messageBody) {
   const match = messageBody.match("Reservation Number - ([A-Z0-9]+)");
@@ -8,10 +8,27 @@ export function getReservationNumber(messageBody) {
   return match[1];
 }
 
+export function getReservationNumberFromOcrText(ocrText) {
+  const match = ocrText.match(/RESERVATION NUMBER ([A-Z0-9]{6})/m);
+  if (match == null) {
+    return null;
+  }
+  return match[1];
+}
+
 export class Reservation {
   public static FromGmailMessage(messageBody): Reservation {
     const reservationNumber = getReservationNumber(messageBody);
-    const trains = IncompleteTrain.FromGmailMessage(messageBody);
+    const trains = Train.FromGmailMessage(messageBody);
+    return new Reservation(
+      reservationNumber,
+      trains,
+    )
+  }
+
+  public static FromOcrText(ocrText): Reservation {
+    const reservationNumber = getReservationNumberFromOcrText(ocrText);
+    const trains = Train.FromOcrText(ocrText);
     return new Reservation(
       reservationNumber,
       trains,
@@ -20,7 +37,7 @@ export class Reservation {
 
   constructor(
     reservationNumber: string,
-    trains: IncompleteTrain[],
+    trains: Train[],
   ) {
     this.reservationNumber = reservationNumber;
     this.trains = trains;
@@ -30,7 +47,7 @@ export class Reservation {
   public reservationNumber: string;
 
   // Trains in the reservation, in order.
-  public trains: IncompleteTrain[];
+  public trains: Train[];
 
   // If true, this reservation appears to have been cancelled.
   public isCancelled: boolean = false;
