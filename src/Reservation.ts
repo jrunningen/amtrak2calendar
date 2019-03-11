@@ -19,11 +19,12 @@ export function getReservationNumberFromOcrText(ocrText) {
 export class Reservation {
   public static FromGmailMessage(messageBody): Reservation {
     const reservationNumber = getReservationNumber(messageBody);
-    const trains = Train.FromGmailMessage(messageBody);
-    return new Reservation(
+    const res = new Reservation(
       reservationNumber,
-      trains,
-    )
+      [],
+    );
+    res.addEmailMessageBody(messageBody);
+    return res;
   }
 
   public static FromOcrText(ocrText): Reservation {
@@ -41,6 +42,10 @@ export class Reservation {
   ) {
     this.reservationNumber = reservationNumber;
     this.trains = trains;
+  }
+
+  public addEmailMessageBody(messageBody) {
+    this.trains = this.trains.concat(Train.FromGmailMessage(messageBody));
   }
 
   // The 6-character reservation number, like "ABC123"
@@ -86,6 +91,10 @@ export class Reservation {
       this.reservationNumber;
   }
 
+  public cancel() {
+    this.isCancelled = true;
+  }
+
   public toDisplayObject() {
     return {
       reservationNumber: this.reservationNumber,
@@ -95,5 +104,35 @@ export class Reservation {
       calendarSearchURL: this.calendarSearchURL(),
       gmailSearchURL: this.gmailSearchURL(),
     };
+  }
+}
+
+export class ReservationCollection {
+  private reservationsByNumber: Map<string, Reservation>;
+
+  constructor() {
+    this.reservationsByNumber = new Map<string, Reservation>();
+  }
+
+  public addEmailMessageBody(messageBody: string) {
+    const reservationNumber = getReservationNumber(messageBody);
+    if (this.reservationsByNumber.has(reservationNumber)) {
+      this.reservationsByNumber[reservationNumber].addEmailMessageBody(messageBody);
+      return;
+    }
+    const res = Reservation.FromGmailMessage(messageBody);
+    this.reservationsByNumber[reservationNumber].addEmailMessageBody(messageBody);
+  }
+
+  public cancel(reservationNumber: string) {
+    if (this.reservationsByNumber.has(reservationNumber)) {
+      this.reservationsByNumber[reservationNumber].cancel();
+    }
+  }
+
+  public toDisplayObject() {
+    return Array.from(this.reservationsByNumber.values()).map(
+      (res: Reservation) => res.toDisplayObject
+    );
   }
 }

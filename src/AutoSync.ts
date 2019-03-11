@@ -5,7 +5,7 @@ import * as moment from "moment";
 import { syncCalendarEvent, getCalendar, getTrainCalendarEvents, getReservationCalendarEvents} from "./Calendar";
 import { ocrAttachment } from "./Ocr";
 import { Train } from "./Train";
-import { Reservation } from "./Reservation";
+import { Reservation, ReservationCollection } from "./Reservation";
 import { getReservationNumber } from "./Reservation";
 import { stationToTimeZone } from "./TzData";
 import { fail } from "assert";
@@ -155,7 +155,7 @@ function autoSync() {
       }
 
       for (const train of trains) {
-        if(syncCalendarEvent(train)) {
+        if(syncCalendarEvent(train, reservationNumber)) {
           trainsSynced.push(train.toParams());
         }
       };
@@ -179,24 +179,16 @@ function autoSync() {
  * associating trains with their gmail messages and attachments.
  */
 function getReservationsFromGmail() {
-  // Remove Cancellations from Calendar
-  const cancelledReservationNumbers = getCancelledReservationNumbers();
-  const threads = getReservationThreads();
-  const reservations = [];
-
-  for (const thread of threads) {
+  const reservations = new ReservationCollection();
+  for (const thread of getReservationThreads()) {
     for (const message of thread.getMessages()) {
       // Checking the message body is cheaper than OCRing text. Scan the email for
       // trains that should be synced. If we don't find any, we can skip the OCR.
-      const messageBody = message.getBody();
-      const reservation = Reservation.FromGmailMessage(messageBody);
-
-      if (cancelledReservationNumbers.indexOf(reservation.reservationNumber) !== -1) {
-        reservation.isCancelled = true;
-      }
-
-      reservations.push(reservation.toDisplayObject());
+      reservations.addEmailMessageBody(message.getBody());
     }
   }
-  return reservations;
+  for (const cancelledReservationNumber of getCancelledReservationNumbers()) {
+    reservations.cancel(cancelledReservationNumber);
+  }
+  return reservations.toDisplayObject();
 }

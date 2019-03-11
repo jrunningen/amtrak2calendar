@@ -95,17 +95,17 @@ export function getReservationCalendarEvents(reservationNumber: string) {
  * @returns boolean True if an event was created, false if the event already
  *     exists.
  */
-export function syncCalendarEvent(train: Train) {
+export function syncCalendarEvent(train: Train, reservationNumber: string) {
   // TODO(jrunningen): This should ideally also find differences in the calendar
   // event dates, and delete or recreate it if necessary.
-  if (getTrainCalendarEvents(train).length > 0) {
+  if (getTrainCalendarEvents(train, reservationNumber).length > 0) {
     return false;
   }
-  createCalendarEvent(train);
+  createCalendarEvent(train, reservationNumber);
   return true;
 }
 
-export function createCalendarEvent(train: Train) {
+export function createCalendarEvent(train: Train, reservationNumber: string) {
   const event = getCalendar().createEvent(
     train.description,
     train.depart.toDate(),
@@ -113,7 +113,7 @@ export function createCalendarEvent(train: Train) {
   );
   event.setDescription(
     "Reservation number: " +
-    train.reservationNumber +
+    reservationNumber +
     "\nCreated by Amtrak2Calendar"
   );
   event.addGuest(Session.getEffectiveUser().getEmail());
@@ -126,7 +126,7 @@ export function createCalendarEvent(train: Train) {
  * @returns The number of calendar events removed. 0 means no matching events
  * were found.
  */
-export function removeTrainEvent(train: Train): Number {
+export function removeTrainEvent(train: Train, reservationNumber: string): Number {
   const events = getCalendar().getEvents(
     train.depart
       .clone()
@@ -136,7 +136,7 @@ export function removeTrainEvent(train: Train): Number {
       .clone()
       .add(1, "hour")
       .toDate(),
-    { search: `Amtrak2Calendar ${train.reservationNumber}` }
+    { search: `Amtrak2Calendar ${reservationNumber}` }
   );
 
   const eventCount = events.length;
