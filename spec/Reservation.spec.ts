@@ -112,4 +112,23 @@ describe("Reservation", () => {
       expect(testCase.reservation.description()).toEqual(testCase.expectedDescription);
     }
   });
+
+  it('provides urls to the calendar and gmail', () => {
+    const reservation = new Reservation(
+      "1D4433",
+      [
+        Train.Incomplete(
+          "Train 173: NEW YORK (PENN STATION), NY - WASHINGTON, DC",
+          ezDate("2019-01-11 15:35"),
+        ),
+        Train.Incomplete(
+          "Train 158: WASHINGTON, DC - NEW YORK (PENN STATION), NY",
+          ezDate("2019-01-13 18:20"),
+        ),
+      ],
+    );
+    expect(reservation.calendarSearchURL()).toEqual('https://calendar.google.com/calendar/r/search?q=amtrak2calendar%201D4433');
+    expect(reservation.gmailSearchURL()).toEqual('https://mail.google.com/mail/u/0/#search/amtrak+1D4433');
+  });
+
 });

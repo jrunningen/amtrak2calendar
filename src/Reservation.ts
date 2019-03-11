@@ -76,12 +76,24 @@ export class Reservation {
     return `${firstTrain.departStationName} -> ${lastTrain.arriveStationName}`;
   }
 
+  public calendarSearchURL() {
+    return "https://calendar.google.com/calendar/r/search?q=amtrak2calendar%20" +
+      this.reservationNumber;
+  }
+
+  public gmailSearchURL() {
+    return "https://mail.google.com/mail/u/0/#search/amtrak+" +
+      this.reservationNumber;
+  }
+
   public toDisplayObject() {
     return {
       reservationNumber: this.reservationNumber,
       description: this.description(),
       isCancelled: this.isCancelled,
       trains: this.trains.map(train => train.toDisplayObject()),
+      calendarSearchURL: this.calendarSearchURL(),
+      gmailSearchURL: this.gmailSearchURL(),
     };
   }
 }

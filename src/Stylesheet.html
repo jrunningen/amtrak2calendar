@@ -138,6 +138,20 @@ div.reservation-info {
   font-weight: bold;
   background: steelblue;
   color: whitesmoke;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+}
+
+div.reservation-info div.reservation-name {
+  flex: 4;
+  align-self: flex-start;
+  font-size: 24;
+}
+
+div.reservation-info div.reservation-calendar-search-links {
+  flex: 1;
+  align-self: flex-end;
 }
 
 div.cancelled-reservation div.reservation-info {

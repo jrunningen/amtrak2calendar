@@ -148,8 +148,14 @@
           let reservationElement = $(`
             <div class="reservation">
               <div class="reservation-info">
-                Reservation <span class="reservation-number">${reservation.reservationNumber}</span>:
-                <span class="reservation-description">${reservation.description}</span>
+                <div class="reservation-name">
+                  Reservation <span class="reservation-number">${reservation.reservationNumber}</span>:
+                  <span class="reservation-description">${reservation.description}</span>
+                </div>
+                <div class="reservation-calendar-search-links">
+                  <a class="material-icons" href="${reservation.calendarSearchURL}">date_range</a>
+                  <a class="material-icons" href="${reservation.gmailSearchURL}">email</a>
+                </div>
               </div>
             </div>
             `);
