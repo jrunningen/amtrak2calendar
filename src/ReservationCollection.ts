@@ -9,15 +9,18 @@ export class ReservationCollection {
     this.reservationsByNumber = {};
   }
 
-  public addEmailMessageBody(messageBody: string) {
+  public addEmailMessageBody(date: Date, messageBody: string) {
     const reservationNumber = getReservationNumber(messageBody);
     if (this.hasReservation(reservationNumber)) {
       this.reservationsByNumber[reservationNumber].addEmailMessageBody(
+        date,
         messageBody
       );
       return;
     }
-    const res = Reservation.FromGmailMessage(messageBody);
+
+    const res = Reservation.NewBlank();
+    res.addEmailMessageBody(date, messageBody);
     this.reservationsByNumber[reservationNumber] = res;
   }
 

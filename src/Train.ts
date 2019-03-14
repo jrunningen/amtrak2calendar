@@ -1,8 +1,8 @@
 import * as moment from "moment-timezone";
 import { stationToTimeZone } from "./TzData";
 
-const DATE_FORMAT = "ddd, MMM D YYYY, h:mm A z";
-const DATE_FORMAT_NO_TZ = "ddd, MMM D YYYY, h:mm A";
+export const DATE_FORMAT = "ddd, MMM D YYYY, h:mm A z";
+export const DATE_FORMAT_NO_TZ = "ddd, MMM D YYYY, h:mm A";
 
 function ocrRegexp(): RegExp {
   const regexpParts: RegExp[] = [

@@ -1,161 +1,170 @@
 <style>
-:root {
-  --background-color: white;
-}
-
-body, html {
-  margin: 0px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background: var(--background-color);
-}
-
-/* Nav */
-
-nav {
-  background: #333333;
-  padding: 5px;
-}
-
-div.nav-text {
-  max-width: 960px;
-  margin: auto;
-}
-
-nav a {
-  padding: 10px;
-  color: cornsilk;
-  text-decoration: none;
-}
-
-nav a:hover {
-  color: salmon;
-}
-
-.hero {
-  background-image: linear-gradient(rgba(255, 255, 255, 0.0), var(--background-color)), url("https://storage.googleapis.com/amtrak2calendar/banner.jpg");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  position: relative;
-  height: 200px;
-}
-
-.hero-text {
-  text-align: center;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  text-shadow: 2px 2px 0 black;
-  font-size: 2em;
-}
-
-/* Keep hero text in the page on smaller screens. */
-@media screen and (max-width: 650px) {
-  .hero-text {
-    font-size: 1em;
+  :root {
+    --background-color: white;
   }
-}
 
-/* Main */
+  body,
+  html {
+    margin: 0px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    background: var(--background-color);
+  }
 
-.container {
-  margin: auto;
-  max-width: 960px;
-  padding: 5px;
-}
+  /* Nav */
 
-.flex {
-  display: flex;
-  flex-flow: row wrap;
-  /* 5px margin between elements only.
+  nav {
+    background: #333333;
+    padding: 5px;
+  }
+
+  div.nav-text {
+    max-width: 960px;
+    margin: auto;
+  }
+
+  nav a {
+    padding: 10px;
+    color: cornsilk;
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: salmon;
+  }
+
+  .hero {
+    background-image: linear-gradient(
+        rgba(255, 255, 255, 0),
+        var(--background-color)
+      ),
+      url("https://storage.googleapis.com/amtrak2calendar/banner.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+    height: 200px;
+  }
+
+  .hero-text {
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-shadow: 2px 2px 0 black;
+    font-size: 2em;
+  }
+
+  /* Keep hero text in the page on smaller screens. */
+  @media screen and (max-width: 650px) {
+    .hero-text {
+      font-size: 1em;
+    }
+  }
+
+  /* Main */
+
+  .container {
+    margin: auto;
+    max-width: 960px;
+    padding: 5px;
+  }
+
+  .flex {
+    display: flex;
+    flex-flow: row wrap;
+    /* 5px margin between elements only.
    * https://stackoverflow.com/questions/20626685/better-way-to-set-distance-between-flexbox-items
    */
-  margin: 0 -5px;
-}
+    margin: 0 -5px;
+  }
 
-.flex div {
-  /* 5px margin between elements only.
+  .flex div {
+    /* 5px margin between elements only.
    * https://stackoverflow.com/questions/20626685/better-way-to-set-distance-between-flexbox-items
    */
-  margin: 0 5px;
-}
+    margin: 0 5px;
+  }
 
-div.help {
-  flex: 2 300px;
-}
+  div.help {
+    flex: 2 300px;
+  }
 
-div.controls {
-  flex: 1 300px;
-}
+  div.controls {
+    flex: 1 300px;
+  }
 
-/* Buttons */
+  /* Buttons */
 
-button {
-  background: dodgerblue;
-  border: none;
-  border-radius: 5px;
-  padding: 8px 14px;
-  font-size: 15px;
-  color: white;
-  width: 100%;
-  margin: 2px;
-}
+  button {
+    background: dodgerblue;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 14px;
+    font-size: 15px;
+    color: white;
+    width: 100%;
+    margin: 2px;
+  }
 
-button:hover {
-  background: deepskyblue;
-}
+  button:hover {
+    background: deepskyblue;
+  }
 
-/* Train list */
+  /* Train list */
 
-div.train-list-item {
-  width: 100%;
-  display: flex;
-  flex-flow: row wrap;
-}
+  div.train-list-item {
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+  }
 
-div.train-list-item span {
-  padding: 5px;
-  flex: 1
-}
+  div.train-list-item span {
+    padding: 5px;
+    flex: 1;
+  }
 
-div.reservation {
-  border-radius: 5px 5px;
-}
+  div.reservation {
+    border-radius: 5px 5px;
+  }
 
-div.train-list-item:nth-of-type(odd) {
-  background: whitesmoke;
-}
+  div.train-list-item:nth-of-type(odd) {
+    background: whitesmoke;
+  }
 
-div.train-list-item:nth-of-type(even) {
-  background: ghostwhite;
-}
+  div.train-list-item:nth-of-type(even) {
+    background: ghostwhite;
+  }
 
-div.reservation-info {
-  padding: 5px;
-  border-radius: 5px 5px 0px 0px;
-  font-weight: bold;
-  background: steelblue;
-  color: whitesmoke;
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-between;
-}
+  div.rescheduled-train {
+    text-decoration: line-through;
+  }
 
-div.reservation-info div.reservation-name {
-  flex: 4;
-  align-self: flex-start;
-  font-size: 24;
-}
+  div.reservation-info {
+    padding: 5px;
+    border-radius: 5px 5px 0px 0px;
+    font-weight: bold;
+    background: steelblue;
+    color: whitesmoke;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+  }
 
-div.reservation-info div.reservation-calendar-search-links {
-  flex: 1;
-  align-self: flex-end;
-}
+  div.reservation-info div.reservation-name {
+    flex: 4;
+    align-self: flex-start;
+    font-size: 24;
+  }
 
-div.cancelled-reservation div.reservation-info {
-  background: salmon;
-}
+  div.reservation-info div.reservation-calendar-search-links {
+    flex: 1;
+    align-self: flex-end;
+  }
 
+  div.cancelled-reservation div.reservation-info {
+    background: salmon;
+  }
 </style>

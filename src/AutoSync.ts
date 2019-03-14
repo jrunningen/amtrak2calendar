@@ -2,14 +2,16 @@
 // - Allow the user to configure time triggers. This might require releasing the same code as a non-gmail add-on.
 
 import * as moment from "moment";
-import { syncCalendarEvent, getCalendar, getTrainCalendarEvents, getReservationCalendarEvents} from "./Calendar";
+// Prettier will try to wrap long import statements across lines, but this breaks ts2gas compilation.
+// prettier-ignore
+import { syncCalendarEvent, getCalendar, getTrainCalendarEvents, getReservationCalendarEvents } from "./Calendar";
 import { ocrAttachment } from "./Ocr";
 import { Train } from "./Train";
 import { getReservationNumber, ReservationCollection } from "./Reservation";
 import { stationToTimeZone } from "./TzData";
 import { fail } from "assert";
 
-const SEARCH_RANGE = '6m';
+const SEARCH_RANGE = "6m";
 
 /**
  * Return the webpage template.
@@ -17,7 +19,7 @@ const SEARCH_RANGE = '6m';
  * From here, users can enable or disable syncing their trains.
  */
 function doGet() {
-  const template = HtmlService.createTemplateFromFile('Index');
+  const template = HtmlService.createTemplateFromFile("Index");
   return template.evaluate();
 }
 
@@ -40,9 +42,11 @@ function include(filename) {
 function isAutoSyncEnabled() {
   const triggers = ScriptApp.getProjectTriggers();
   for (const trigger of triggers) {
-    if (trigger.getHandlerFunction() === "autoSync" &&
-        trigger.getEventType() === ScriptApp.EventType.CLOCK) {
-          return true;
+    if (
+      trigger.getHandlerFunction() === "autoSync" &&
+      trigger.getEventType() === ScriptApp.EventType.CLOCK
+    ) {
+      return true;
     }
   }
   return false;
@@ -55,10 +59,10 @@ function isAutoSyncEnabled() {
  */
 function createAutoSyncTrigger() {
   removeAllTriggers();
-  ScriptApp.newTrigger('autoSync')
-      .timeBased()
-      .everyHours(1)
-      .create();
+  ScriptApp.newTrigger("autoSync")
+    .timeBased()
+    .everyHours(1)
+    .create();
 }
 
 /**
@@ -90,7 +94,9 @@ function getCancellationThreads(): GoogleAppsScript.Gmail.GmailThread[] {
 }
 
 function getCancelledReservationNumbers(): string[] {
-  return getCancellationThreads().map((thread) => getReservationNumber(thread.getMessages()[0]));
+  return getCancellationThreads().map((thread) =>
+    getReservationNumber(thread.getMessages()[0])
+  );
 }
 
 /**
@@ -120,7 +126,9 @@ function autoSync() {
 
       reservationsFound.push(reservationNumber);
 
-      const reservationCalendarEvents = getReservationCalendarEvents(reservationNumber);
+      const reservationCalendarEvents = getReservationCalendarEvents(
+        reservationNumber
+      );
       if (reservationCalendarEvents.length !== 0) {
         reservationsAlreadyPresent.push(reservationNumber);
 
@@ -154,12 +162,12 @@ function autoSync() {
       }
 
       for (const train of trains) {
-        if(syncCalendarEvent(train, reservationNumber)) {
+        if (syncCalendarEvent(train, reservationNumber)) {
           trainsSynced.push(train.toParams());
         }
-      };
-    };
-  };
+      }
+    }
+  }
 
   return {
     reservationsFound: reservationsFound,
@@ -183,7 +191,7 @@ function getReservationsFromGmail() {
     for (const message of thread.getMessages()) {
       // Checking the message body is cheaper than OCRing text. Scan the email for
       // trains that should be synced. If we don't find any, we can skip the OCR.
-      reservations.addEmailMessageBody(message.getBody());
+      reservations.addEmailMessageBody(message.getDate(), message.getBody());
     }
   }
   for (const cancelledReservationNumber of getCancelledReservationNumbers()) {

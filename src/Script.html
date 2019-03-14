@@ -1,6 +1,6 @@
 <script>
   function setStatus(statusText) {
-    $('#status').text(statusText);
+    $("#status").text(statusText);
   }
 
   function finishedStatus() {
@@ -13,7 +13,7 @@
   }
 
   function syncNow() {
-    $('#status').text("Syncing...");
+    $("#status").text("Syncing...");
     google.script.run
       .withSuccessHandler((results) => {
         console.log(results);
@@ -47,11 +47,11 @@
   }
 
   function selectNewCalendar(calendarId, calendarName) {
-    setStatus("Switching to calendar \"" + calendarName + "\"...");
+    setStatus('Switching to calendar "' + calendarName + '"...');
     google.script.run
       .withSuccessHandler(() => {
         setStatus("Finished!");
-        $('#selectedCalendarName').text(calendarName);
+        $("#selectedCalendarName").text(calendarName);
       })
       .withFailureHandler(failedStatus)
       .setCalendarId(calendarId);
@@ -61,13 +61,13 @@
     google.script.run
       .withSuccessHandler((isAutoSyncEnabled) => {
         if (isAutoSyncEnabled) {
-          $('#autoSyncStatus').text("enabled");
+          $("#autoSyncStatus").text("enabled");
         } else {
-          $('#autoSyncStatus').text("disabled");
+          $("#autoSyncStatus").text("disabled");
         }
       })
       .withFailureHandler(() => {
-        $('#autoSyncStatus').text(" in an unknown state.");
+        $("#autoSyncStatus").text(" in an unknown state.");
       })
       .isAutoSyncEnabled();
   }
@@ -80,7 +80,7 @@
    *     autoSync().
    */
   function displayLastRun(results) {
-    $("#lastRunResults").html('');
+    $("#lastRunResults").html("");
     if (results.reservationsFound.length !== 0) {
       $("#lastRunResults").append(`
         <p>Found reservations:</p><ul id="reservationsFound"></ul>
@@ -117,17 +117,19 @@
   function getCalendars() {
     google.script.run
       .withSuccessHandler((selectedCalendarName) => {
-        $('#selectedCalendarName').text(selectedCalendarName);
+        $("#selectedCalendarName").text(selectedCalendarName);
       })
       .withFailureHandler(failedStatus)
       .getCalendarName();
 
     google.script.run
       .withSuccessHandler((calendarNamesAndIds) => {
-        $('#calendarButtons').empty();
+        $("#calendarButtons").empty();
         for (const calendar of calendarNamesAndIds) {
-          $('#calendarButtons').append(`
-            <button type="button" class="calendar-button" onclick="selectNewCalendar('${calendar.id}', '${calendar.name}')">
+          $("#calendarButtons").append(`
+            <button type="button" class="calendar-button" onclick="selectNewCalendar('${
+              calendar.id
+            }', '${calendar.name}')">
               ${calendar.name}
             </button>
           `);
@@ -136,7 +138,6 @@
       .withFailureHandler(failedStatus)
       .getCalendarNamesAndIds();
   }
-
 
   /* Populate a list of reservations by reading Gmail */
   function getReservations() {
@@ -149,16 +150,24 @@
             <div class="reservation">
               <div class="reservation-info">
                 <div class="reservation-name">
-                  Reservation <span class="reservation-number">${reservation.reservationNumber}</span>:
-                  <span class="reservation-description">${reservation.description}</span>
+                  Reservation <span class="reservation-number">${
+                    reservation.reservationNumber
+                  }</span>:
+                  <span class="reservation-description">${
+                    reservation.description
+                  }</span>
                 </div>
                 <div class="reservation-calendar-search-links">
-                  <a class="material-icons" href="${reservation.calendarSearchURL}">date_range</a>
-                  <a class="material-icons" href="${reservation.gmailSearchURL}">email</a>
+                  <a class="material-icons" href="${
+                    reservation.calendarSearchURL
+                  }">date_range</a>
+                  <a class="material-icons" href="${
+                    reservation.gmailSearchURL
+                  }">email</a>
                 </div>
               </div>
             </div>
-            `);
+          `);
           if (reservation.isCancelled) {
             reservationElement.addClass("cancelled-reservation");
           }
@@ -170,11 +179,21 @@
               </div>
             `);
           }
+          for (const trains of reservation.rescheduledTrains) {
+            for (const train of trains) {
+              reservationElement.append(`
+                <div class="train-list-item rescheduled-train">
+                  <span class="train-name">${train.name}</span>
+                  <span class="train-depart">${train.depart}</span>
+                </div>
+              `);
+            }
+          }
           $("#trainList").append(reservationElement);
         }
       })
       .withFailureHandler(failedStatus)
-      .getReservationsFromGmail()
+      .getReservationsFromGmail();
   }
 
   getAutoSyncStatus();
