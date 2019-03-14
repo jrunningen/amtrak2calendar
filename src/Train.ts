@@ -1,5 +1,5 @@
 import * as moment from "moment-timezone";
-import { stationToTimeZone } from "./TzData"
+import { stationToTimeZone } from "./TzData";
 
 const DATE_FORMAT = "ddd, MMM D YYYY, h:mm A z";
 const DATE_FORMAT_NO_TZ = "ddd, MMM D YYYY, h:mm A";
@@ -40,6 +40,62 @@ function ocrRegexp(): RegExp {
 }
 
 export class Train {
+  /** Returns the train's number, like "123". */
+  public get number(): string {
+    const trainNumberMatch = this.name.match(/\d+/);
+    if (trainNumberMatch == null) {
+      return "";
+    }
+    return trainNumberMatch[0];
+  }
+
+  public get trainNumber(): string {
+    const match = this.name.match("Train ([0-9]+):");
+    if (match == null) {
+      return "???";
+    }
+    return match[1];
+  }
+
+  public get description(): string {
+    return `Amtrak Train ${this.number}: ${this.originStation} -> ${
+      this.destinationStation
+    }`;
+  }
+
+  public get departString(): string {
+    return this.depart.format(DATE_FORMAT);
+  }
+
+  public get arriveString(): string {
+    return this.arrive.format(DATE_FORMAT);
+  }
+
+  public get departTimeZone(): string {
+    return stationToTimeZone(this.originStation);
+  }
+
+  public get arriveTimeZone(): string {
+    return stationToTimeZone(this.destinationStation);
+  }
+
+  // FIXME: Make these names consistent.
+  public get departStationName(): string {
+    const match = this.name.match(":(.*) - ");
+    if (match == null) {
+      return "???";
+    }
+    return match[1].trim();
+  }
+
+  // FIXME: Make these names consistent.
+  public get arriveStationName(): string {
+    const match = this.name.match(" - (.*)");
+    if (match == null) {
+      return "???";
+    }
+    return match[1].trim();
+  }
   public static FromParams(params: any): Train {
     return new Train(
       params.name,
@@ -49,23 +105,8 @@ export class Train {
       moment.tz(params.arrive, stationToTimeZone(params.destinationStation)),
       // FIXME: Test this thoroughly. I don't understand how the timezones can
       // get messed up, exactly.
-      moment(params.depart),
+      moment(params.depart)
     );
-  }
-
-  /**
-   * Return a dict representing this train, so it can be stored in callback params and rebuilt in a callback.
-   *
-   * Train.FromParams(train.toParams()) === train.
-   */
-  public toParams() {
-    return {
-      arrive: this.arrive.format(),
-      depart: this.depart.format(),
-      originStation: this.originStation,
-      destinationStation: this.destinationStation,
-      name: this.name,
-    };
   }
 
   /**
@@ -83,10 +124,7 @@ export class Train {
         // FIXME: Get the departure station from the message body, if possible.
         const depart = moment(match[2], "hh:mm a, ddd, MMMM DD YYYY");
         const name = match[1];
-        const train = Train.Incomplete(
-          name,
-          depart,
-        );
+        const train = Train.Incomplete(name, depart);
         trains.push(train);
       }
     } while (match);
@@ -95,7 +133,9 @@ export class Train {
   }
 
   public static FromOcrText(ocrText): Train[] {
-    const stationsMatch = ocrText.match(/(\b\w{3}\b) (\b\w{3}\b) (Round-Trip|One-Way)/m);
+    const stationsMatch = ocrText.match(
+      /(\b\w{3}\b) (\b\w{3}\b) (Round-Trip|One-Way)/m
+    );
     if (stationsMatch === null) {
       return [];
     }
@@ -147,13 +187,35 @@ export class Train {
             origin,
             destination,
             departureTime,
-            arrivalTime,
+            arrivalTime
           )
         );
       }
     } while (match);
 
     return trains;
+  }
+
+  public static Incomplete(name: string, departLocalTime: moment.Moment) {
+    return new Train(name, "", "", null, null, departLocalTime);
+  }
+
+  public static Legacy(
+    trainName: string,
+    // FIXME: Rename these to departStation/arriveStation.
+    originStation: string,
+    destinationStation: string,
+    depart: moment.Moment,
+    arrive: moment.Moment
+  ) {
+    return new Train(
+      trainName,
+      originStation,
+      destinationStation,
+      depart.tz(stationToTimeZone(originStation)),
+      arrive.tz(stationToTimeZone(destinationStation)),
+      moment(depart.format()) // Drop the timezone awareness.
+    );
   }
 
   // Train number and human-readable stations. Example:
@@ -178,7 +240,7 @@ export class Train {
     destinationStation: string,
     depart: moment.Moment,
     arrive: moment.Moment,
-    departLocalTime: moment.Moment,
+    departLocalTime: moment.Moment
   ) {
     this.name = trainName;
     this.arrive = arrive;
@@ -188,93 +250,20 @@ export class Train {
     this.departLocalTime = departLocalTime;
   }
 
-  public static Incomplete(
-    name: string,
-    departLocalTime: moment.Moment,
-  ) {
-    return new Train(
-      name,
-      '',
-      '',
-      null,
-      null,
-      departLocalTime,
-    );
+  /**
+   * Return a dict representing this train, so it can be stored in callback params and rebuilt in a callback.
+   *
+   * Train.FromParams(train.toParams()) === train.
+   */
+  public toParams() {
+    return {
+      arrive: this.arrive.format(),
+      depart: this.depart.format(),
+      originStation: this.originStation,
+      destinationStation: this.destinationStation,
+      name: this.name,
+    };
   }
-
-  public static Legacy (
-    trainName: string,
-    // FIXME: Rename these to departStation/arriveStation.
-    originStation: string,
-    destinationStation: string,
-    depart: moment.Moment,
-    arrive: moment.Moment,
-  ) {
-    return new Train(
-      trainName,
-      originStation,
-      destinationStation,
-      depart.tz(stationToTimeZone(originStation)),
-      arrive.tz(stationToTimeZone(destinationStation)),
-      moment(depart.format()), // Drop the timezone awareness.
-    );
-  }
-
-  /** Returns the train's number, like "123". */
-  public get number(): string {
-    const trainNumberMatch = this.name.match(/\d+/);
-    if (trainNumberMatch == null) {
-      return "";
-    }
-    return trainNumberMatch[0];
-  }
-
-  public get trainNumber(): string {
-    const match = this.name.match("Train ([0-9]+):");
-    if (match == null) {
-      return '???';
-    }
-    return match[1];
-  }
-
-  public get description(): string {
-    return `Amtrak Train ${this.number}: ${this.originStation} -> ${this.destinationStation}`;
-  }
-
-  public get departString(): string {
-    return this.depart.format(DATE_FORMAT);
-  }
-
-  public get arriveString(): string {
-    return this.arrive.format(DATE_FORMAT);
-  }
-
-  public get departTimeZone(): string {
-    return stationToTimeZone(this.originStation);
-  }
-
-  public get arriveTimeZone(): string {
-    return stationToTimeZone(this.destinationStation);
-  }
-
-  // FIXME: Make these names consistent.
-  public get departStationName(): string {
-    const match = this.name.match(":(.*) - ");
-    if (match == null) {
-      return '???';
-    }
-    return match[1].trim();
-  }
-
-  // FIXME: Make these names consistent.
-  public get arriveStationName():string {
-    const match = this.name.match(" - (.*)");
-    if (match == null) {
-      return '???';
-    }
-    return match[1].trim();
-  }
-
 
   /**
    * Return a dict of display-formatted strings representing this train, so it
@@ -294,4 +283,3 @@ export class Train {
     };
   }
 }
-
