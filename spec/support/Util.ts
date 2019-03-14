@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
-import { join } from "path";
 import * as moment from "moment-timezone";
+import { join } from "path";
 
 const testdataPath = "spec/testdata";
 
