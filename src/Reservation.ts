@@ -60,8 +60,8 @@ export class Reservation {
         this.trains[0].arriveStationName
       } (one-way)`;
     }
+    const firstTrain = this.trains[0];
     if (this.trains.length === 2) {
-      const firstTrain = this.trains[0];
       const secondTrain = this.trains[1];
       if (
         firstTrain.departStationName === secondTrain.arriveStationName &&
@@ -75,7 +75,6 @@ export class Reservation {
         secondTrain.arriveStationName
       }`;
     }
-    const firstTrain = this.trains[0];
     const lastTrain = this.trains[this.trains.length - 1];
     return `${firstTrain.departStationName} -> ${lastTrain.arriveStationName}`;
   }

@@ -34,7 +34,9 @@ export class ReservationCollection {
     const reservations = [];
     for (const reservationNumber in this.reservationsByNumber) {
       if (this.hasReservation(reservationNumber)) {
-        reservations.push(this.reservationsByNumber[reservationNumber].toDisplayObject());
+        reservations.push(
+          this.reservationsByNumber[reservationNumber].toDisplayObject()
+        );
       }
     }
     return reservations;
