@@ -1,4 +1,12 @@
+import { readFileSync } from "fs";
+import { join } from "path";
 import * as moment from "moment-timezone";
+
+const testdataPath = "spec/testdata";
+
+export function testFileText(testFileName: string) {
+  return readFileSync(join(testdataPath, testFileName), "utf8");
+}
 
 /**
  * Create a readable date, for testing.

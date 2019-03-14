@@ -1,9 +1,7 @@
-import { readFileSync } from "fs";
 import * as moment from "moment-timezone";
-import { join } from "path";
-import { Train } from "../src/Train";
 import { Reservation } from "../src/Reservation";
-import { ezDate, momentEqualityTester } from "./support/Util";
+import { Train } from "../src/Train";
+import { ezDate, momentEqualityTester, testFileText } from "./support/Util";
 
 describe("Train", () => {
   beforeEach(() => {
@@ -296,8 +294,7 @@ describe("Train", () => {
     ]);
     const testdataPath = "spec/testdata";
     for (const file of testCases.keys()) {
-      const ticketText = readFileSync(join(testdataPath, file), "utf8");
-      const reservation = Reservation.FromOcrText(ticketText);
+      const reservation = Reservation.FromOcrText(testFileText(file));
       expect(reservation).toEqual(testCases.get(file));
     }
   });

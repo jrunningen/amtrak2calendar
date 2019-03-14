@@ -1,7 +1,7 @@
 import { readFileSync } from "fs";
 import { Train } from "../src/Train";
 import { Reservation } from "../src/Reservation";
-import { ezDate, momentEqualityTester } from "./support/Util";
+import { ezDate, momentEqualityTester, testFileText } from "./support/Util";
 import { join } from "path";
 
 describe("Reservation", () => {
@@ -46,8 +46,7 @@ describe("Reservation", () => {
     ]);
     const testdataPath = "spec/testdata";
     for (const file of testCases.keys()) {
-      const messageText = readFileSync(join(testdataPath, file), "utf8");
-      const reservation = Reservation.FromGmailMessage(messageText);
+      const reservation = Reservation.FromGmailMessage(testFileText(file));
       expect(reservation).toEqual(testCases.get(file));
     }
   });
