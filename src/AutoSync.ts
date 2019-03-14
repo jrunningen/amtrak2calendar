@@ -5,8 +5,7 @@ import * as moment from "moment";
 import { syncCalendarEvent, getCalendar, getTrainCalendarEvents, getReservationCalendarEvents} from "./Calendar";
 import { ocrAttachment } from "./Ocr";
 import { Train } from "./Train";
-import { Reservation, ReservationCollection } from "./Reservation";
-import { getReservationNumber } from "./Reservation";
+import { getReservationNumber, ReservationCollection } from "./Reservation";
 import { stationToTimeZone } from "./TzData";
 import { fail } from "assert";
 
