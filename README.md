@@ -30,7 +30,7 @@ See the code
 Amtrak2Calendar is deployed to http://amtrak2calendar.runningen.net. It's
 implemented purely in Google Apps Script. Anyone is free to view the [live,
 currently-deployed
-code](https://script.google.com/d/16N8B7R4oi0fVO3Aqh5fXICTbNsP5uKi_F1ZhJ_SX8X6JJ_M6GhxrYcyV/edit?usp=sharing)
+code](https://script.google.com/d/16N8B7R4oi0fVO3Aqh5fXICTbNsP5uKi_F1ZhJ_SX8X6JJ_M6GhxrYcyV/edit?usp=sharing).
 
 Feedback
 --------
