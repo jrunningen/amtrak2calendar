@@ -24,6 +24,14 @@ then you can click the button to "enable auto-sync."
 From then on, Amtrak2Calendar will scan for new Amtrak tickets once per hour,
 and sync them to your calendar as necessary.
 
+See the code
+------------
+
+Amtrak2Calendar is deployed to http://amtrak2calendar.runningen.net. It's
+implemented purely in Google Apps Script. Anyone is free to view the [live,
+currently-deployed
+code](https://script.google.com/d/16N8B7R4oi0fVO3Aqh5fXICTbNsP5uKi_F1ZhJ_SX8X6JJ_M6GhxrYcyV/edit?usp=sharing)
+
 Feedback
 --------
 
