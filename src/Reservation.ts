@@ -201,6 +201,14 @@ export class Reservation {
     };
   }
 
+  /**
+   * For all trains in this reservation, make sure the calendar is up to date.
+   *
+   * This function sends logs to Stackdriver when it creates an event, deletes
+   * an event, or finds a matching event. These logs don't contain reservation
+   * information, but exist for the purpose of measuring general beavhior of
+   * the app across all users.
+   */
   public syncToCalendar() {
     // Get existing calendar events for this reservation number.
     const reservationCalendarEvents = getReservationCalendarEvents(
@@ -222,10 +230,11 @@ export class Reservation {
     for (const train of this.trains) {
       for (const event of reservationCalendarEvents) {
         if (train.matchCalendarEvent(this.reservationNumber, event)) {
-          console.info;
+          console.info("matched train event");
           continue;
         }
       }
+      console.info("creating train event");
       createCalendarEvent(train, this.reservationNumber);
     }
 
@@ -236,6 +245,7 @@ export class Reservation {
           continue;
         }
       }
+      console.info("deleting train event");
       event.deleteEvent();
     }
   }
