@@ -1,6 +1,6 @@
-import { Train } from "./Train";
 // prettier-ignore
 import { createCalendarEvent, getReservationCalendarEvents, syncCalendarEvent } from "./Calendar";
+import { Train } from "./Train";
 
 export function getReservationNumber(messageBody) {
   const match = messageBody.match("Reservation Number - ([A-Z0-9]+)");
@@ -50,12 +50,12 @@ export class Reservation {
   // Trains that have been rescheduled
   public rescheduledTrains: Train[][] = [];
 
+  // If true, this reservation appears to have been cancelled.
+  public isCancelled: boolean = false;
+
   // The date of the email message that this came from. If another email message
   // is added, and it's newer, then we overwrite the current itinerary.
   private date: Date = null;
-
-  // If true, this reservation appears to have been cancelled.
-  public isCancelled: boolean = false;
 
   constructor(reservationNumber: string, date: Date, trains: Train[]) {
     this.reservationNumber = reservationNumber;
@@ -167,12 +167,6 @@ export class Reservation {
     return `${firstTrain.departStationName} -> ${lastTrain.arriveStationName}`;
   }
 
-  private checkReservationNumber() {
-    if (this.reservationNumber === null) {
-      throw new Error("reservation number not set");
-    }
-  }
-
   public calendarSearchURL(): string {
     this.checkReservationNumber();
     return (
@@ -239,6 +233,12 @@ export class Reservation {
         }
       }
       event.deleteEvent();
+    }
+  }
+
+  private checkReservationNumber() {
+    if (this.reservationNumber === null) {
+      throw new Error("reservation number not set");
     }
   }
 }
