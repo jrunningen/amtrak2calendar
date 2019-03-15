@@ -202,11 +202,6 @@ export class Reservation {
   }
 
   public syncToCalendar() {
-    // Define calendar events that we would create.
-    for (const train of this.trains) {
-      const success = syncCalendarEvent(train, this.reservationNumber);
-    }
-
     // Get existing calendar events for this reservation number.
     const reservationCalendarEvents = getReservationCalendarEvents(
       this.reservationNumber
