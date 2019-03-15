@@ -124,7 +124,68 @@ describe("Reservation", () => {
     );
   });
 
-  it("handles changes to reservations", () => {
+  // FIXME: Names and reservation descriptions differ depending on whether
+  // information was added by email message body or OCR text. We can get away
+  // with this for now, because we only use one or the other in a single
+  // operation. Still, it's jarring, and should be made consistent.
+  it("handles changes to reservations from OCR text", () => {
+    const want = {
+      calendarSearchURL:
+        "https://calendar.google.com/calendar/r/search?q=amtrak2calendar%20ABCDEF",
+      description: "NYP -> WAS (round trip)",
+      gmailSearchURL: "https://mail.google.com/mail/u/0/#search/amtrak+ABCDEF",
+      isCancelled: false,
+      reservationNumber: "ABCDEF",
+      trains: [
+        {
+          depart: ezDateNoTz("2019-04-19 15:35").format(DATE_FORMAT_NO_TZ),
+          name: "173",
+        },
+        {
+          depart: ezDateNoTz("2019-04-21 20:30").format(DATE_FORMAT_NO_TZ),
+          name: "90",
+        },
+      ],
+      rescheduledTrains: [
+        [
+          {
+            depart: ezDateNoTz("2019-03-15 15:35").format(DATE_FORMAT_NO_TZ),
+            name: "173",
+          },
+          {
+            depart: ezDateNoTz("2019-03-17 20:30").format(DATE_FORMAT_NO_TZ),
+            name: "90",
+          },
+        ],
+      ],
+    };
+
+    // The order in which they're added shouldn't matter. The most recent
+    // itinerary is canonical.
+    const reservationInOrder = Reservation.NewBlank();
+    reservationInOrder.addOcrText(
+      dummyDate,
+      testFileText("ocr text original reservation.txt")
+    );
+    reservationInOrder.addOcrText(
+      newerDummyDate,
+      testFileText("ocr text modified reservation.txt")
+    );
+    expect(reservationInOrder.toDisplayObject()).toEqual(want);
+
+    const reservationOutOfOrder = Reservation.NewBlank();
+    reservationOutOfOrder.addOcrText(
+      newerDummyDate,
+      testFileText("ocr text modified reservation.txt")
+    );
+    reservationOutOfOrder.addOcrText(
+      dummyDate,
+      testFileText("ocr text original reservation.txt")
+    );
+    expect(reservationOutOfOrder.toDisplayObject()).toEqual(want);
+  });
+
+  it("handles changes to reservations from email message bodies", () => {
     const want = {
       calendarSearchURL:
         "https://calendar.google.com/calendar/r/search?q=amtrak2calendar%20ABCDEF",

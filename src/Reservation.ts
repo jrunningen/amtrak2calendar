@@ -61,6 +61,41 @@ export class Reservation {
     this.trains = trains;
   }
 
+  public addOcrText(date: Date, ocrText: string) {
+    const reservationNumber = getReservationNumberFromOcrText(ocrText);
+    if (reservationNumber === null) {
+      throw new Error("null reservation number");
+    }
+
+    if (this.reservationNumber === "") {
+      this.reservationNumber = reservationNumber;
+    }
+    // If there's a mismatch in reservation number, it's a logic error.
+    if (this.reservationNumber !== reservationNumber) {
+      throw new Error("reservation number mismatch");
+    }
+
+    const trains = Train.FromOcrText(ocrText);
+    // This itinerary is newer or the first, so make it current.
+    if (this.date === null) {
+      this.date = date;
+      this.trains = trains;
+      return;
+    }
+
+    if (this.date < date) {
+      this.date = date;
+      if (this.trains.length !== 0) {
+        this.rescheduledTrains.push(this.trains);
+      }
+      this.trains = trains;
+      return;
+    }
+
+    // Otherwise, this itinerary is older than what we have.
+    this.rescheduledTrains.push(trains);
+  }
+
   public addEmailMessageBody(date: Date, messageBody: string) {
     const reservationNumber = getReservationNumber(messageBody);
 
@@ -125,14 +160,22 @@ export class Reservation {
     return `${firstTrain.departStationName} -> ${lastTrain.arriveStationName}`;
   }
 
-  public calendarSearchURL() {
+  private checkReservationNumber() {
+    if (this.reservationNumber === null) {
+      throw new Error("reservation number not set");
+    }
+  }
+
+  public calendarSearchURL(): string {
+    this.checkReservationNumber();
     return (
       "https://calendar.google.com/calendar/r/search?q=amtrak2calendar%20" +
       this.reservationNumber
     );
   }
 
-  public gmailSearchURL() {
+  public gmailSearchURL(): string {
+    this.checkReservationNumber();
     return (
       "https://mail.google.com/mail/u/0/#search/amtrak+" +
       this.reservationNumber

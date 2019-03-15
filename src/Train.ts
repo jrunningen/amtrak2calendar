@@ -83,7 +83,7 @@ export class Train {
   public get departStationName(): string {
     const match = this.name.match(":(.*) - ");
     if (match == null) {
-      return "???";
+      return this.originStation;
     }
     return match[1].trim();
   }
@@ -92,7 +92,7 @@ export class Train {
   public get arriveStationName(): string {
     const match = this.name.match(" - (.*)");
     if (match == null) {
-      return "???";
+      return this.destinationStation;
     }
     return match[1].trim();
   }
