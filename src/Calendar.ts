@@ -92,6 +92,7 @@ export function getReservationCalendarEvents(reservationNumber: string) {
 
 export function clearGlitchedEvents() {
   for (const event of getReservationCalendarEvents("undefined")) {
+    console.warn("Removed a glitched event");
     event.deleteEvent();
   }
 }
