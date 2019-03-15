@@ -15,7 +15,7 @@ export function getCalendar() {
   if (activeCalendar != null) {
     return activeCalendar;
   }
-  let calendarId = getCalendarId();
+  const calendarId = getCalendarId();
   if (calendarId == null || calendarId === "") {
     return CalendarApp.getDefaultCalendar();
   }
@@ -83,8 +83,10 @@ export function getCalendarNamesAndIds() {
 }
 
 export function getReservationCalendarEvents(reservationNumber: string) {
-  var now = new Date();
-  var oneYearFromNow = new Date(now.getTime() + 12 * 30 * 24 * 60 * 60 * 1000);
+  const now = new Date();
+  const oneYearFromNow = new Date(
+    now.getTime() + 12 * 30 * 24 * 60 * 60 * 1000
+  );
   return getCalendar().getEvents(now, oneYearFromNow, {
     search: `Amtrak2Calendar ${reservationNumber}`,
   });
@@ -122,35 +124,4 @@ export function createCalendarEvent(train: Train, reservationNumber: string) {
     "Reservation number: " + reservationNumber + "\nCreated by Amtrak2Calendar"
   );
   event.addGuest(Session.getEffectiveUser().getEmail());
-}
-
-/**
- * Removes the given train from the calendar, if found.
- *
- * @param train
- * @returns The number of calendar events removed. 0 means no matching events
- * were found.
- */
-export function removeTrainEvent(
-  train: Train,
-  reservationNumber: string
-): Number {
-  const events = getCalendar().getEvents(
-    train.depart
-      .clone()
-      .add(-24, "hour")
-      .toDate(),
-    train.depart
-      .clone()
-      .add(1, "hour")
-      .toDate(),
-    { search: `Amtrak2Calendar ${reservationNumber}` }
-  );
-
-  const eventCount = events.length;
-  events.forEach((event) => {
-    event.deleteEvent();
-  });
-
-  return eventCount;
 }
