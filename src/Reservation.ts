@@ -212,6 +212,14 @@ export class Reservation {
       this.reservationNumber
     );
 
+    // If this reservation is cancelled, delete all of the events.
+    if (this.isCancelled) {
+      for (const event of reservationCalendarEvents) {
+        event.deleteEvent();
+      }
+      return;
+    }
+
     // Do they match our current trains? The number of events and trains should
     // be low, so we do a naive set difference in both directions.
 
@@ -219,6 +227,7 @@ export class Reservation {
     for (const train of this.trains) {
       for (const event of reservationCalendarEvents) {
         if (train.matchCalendarEvent(this.reservationNumber, event)) {
+          console.info;
           continue;
         }
       }
