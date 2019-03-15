@@ -53,7 +53,10 @@ export function setCalendarId(calendarId: string) {
  *
  * @param train The train.
  */
-export function getTrainCalendarEvents(train: Train, reservationNumber: string) {
+export function getTrainCalendarEvents(
+  train: Train,
+  reservationNumber: string
+) {
   return getCalendar().getEvents(
     train.depart
       .clone()
@@ -74,18 +77,23 @@ export function getCalendarNamesAndIds() {
     results.push({
       name: calendar.getName(),
       id: calendar.getId(),
-    })
+    });
   }
   return results;
 }
 
 export function getReservationCalendarEvents(reservationNumber: string) {
   var now = new Date();
-  var oneYearFromNow = new Date(now.getTime() + (12 * 30 * 24 * 60 * 60 * 1000));
-  return getCalendar().getEvents(
-    now,
-    oneYearFromNow,
-    {search: `Amtrak2Calendar ${reservationNumber}`});
+  var oneYearFromNow = new Date(now.getTime() + 12 * 30 * 24 * 60 * 60 * 1000);
+  return getCalendar().getEvents(now, oneYearFromNow, {
+    search: `Amtrak2Calendar ${reservationNumber}`,
+  });
+}
+
+export function clearGlitchedEvents() {
+  for (const event of getReservationCalendarEvents("undefined")) {
+    event.deleteEvent();
+  }
 }
 
 /**
@@ -105,16 +113,12 @@ export function syncCalendarEvent(train: Train, reservationNumber: string) {
   return true;
 }
 
+// FIXME: Just make this a method of the train class, maybe.
 export function createCalendarEvent(train: Train, reservationNumber: string) {
-  const event = getCalendar().createEvent(
-    train.description,
-    train.depart.toDate(),
-    train.arrive.toDate()
-  );
+  const cal = getCalendar();
+  const event = cal.createEvent.apply(cal, train.calendarEventParams());
   event.setDescription(
-    "Reservation number: " +
-    reservationNumber +
-    "\nCreated by Amtrak2Calendar"
+    "Reservation number: " + reservationNumber + "\nCreated by Amtrak2Calendar"
   );
   event.addGuest(Session.getEffectiveUser().getEmail());
 }
@@ -126,7 +130,10 @@ export function createCalendarEvent(train: Train, reservationNumber: string) {
  * @returns The number of calendar events removed. 0 means no matching events
  * were found.
  */
-export function removeTrainEvent(train: Train, reservationNumber: string): Number {
+export function removeTrainEvent(
+  train: Train,
+  reservationNumber: string
+): Number {
   const events = getCalendar().getEvents(
     train.depart
       .clone()

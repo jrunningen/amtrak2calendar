@@ -1,4 +1,6 @@
 import { Train } from "./Train";
+// prettier-ignore
+import { createCalendarEvent, getReservationCalendarEvents, syncCalendarEvent } from "./Calendar";
 
 export function getReservationNumber(messageBody) {
   const match = messageBody.match("Reservation Number - ([A-Z0-9]+)");
@@ -67,12 +69,17 @@ export class Reservation {
       throw new Error("null reservation number");
     }
 
-    if (this.reservationNumber === "") {
+    if (this.reservationNumber === "" || this.reservationNumber === null) {
       this.reservationNumber = reservationNumber;
     }
+
     // If there's a mismatch in reservation number, it's a logic error.
     if (this.reservationNumber !== reservationNumber) {
-      throw new Error("reservation number mismatch");
+      throw new Error(
+        `reservation number mismatch: ${
+          this.reservationNumber
+        } !== ${reservationNumber}`
+      );
     }
 
     const trains = Train.FromOcrText(ocrText);
@@ -198,5 +205,40 @@ export class Reservation {
         trains.map((train) => train.toDisplayObject())
       ),
     };
+  }
+
+  public syncToCalendar() {
+    // Define calendar events that we would create.
+    for (const train of this.trains) {
+      const success = syncCalendarEvent(train, this.reservationNumber);
+    }
+
+    // Get existing calendar events for this reservation number.
+    const reservationCalendarEvents = getReservationCalendarEvents(
+      this.reservationNumber
+    );
+
+    // Do they match our current trains? The number of events and trains should
+    // be low, so we do a naive set difference in both directions.
+
+    // First, sync unmatched trains.
+    for (const train of this.trains) {
+      for (const event of reservationCalendarEvents) {
+        if (train.matchCalendarEvent(this.reservationNumber, event)) {
+          continue;
+        }
+      }
+      createCalendarEvent(train, this.reservationNumber);
+    }
+
+    // Second, delete unmatched calendar events.
+    for (const event of reservationCalendarEvents) {
+      for (const train of this.trains) {
+        if (train.matchCalendarEvent(this.reservationNumber, event)) {
+          continue;
+        }
+      }
+      event.deleteEvent();
+    }
   }
 }

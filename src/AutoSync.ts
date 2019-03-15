@@ -4,10 +4,11 @@
 import * as moment from "moment";
 // Prettier will try to wrap long import statements across lines, but this breaks ts2gas compilation.
 // prettier-ignore
-import { syncCalendarEvent, getCalendar, getTrainCalendarEvents, getReservationCalendarEvents } from "./Calendar";
+import { clearGlitchedEvents, getCalendar, getTrainCalendarEvents, getReservationCalendarEvents } from "./Calendar";
 import { ocrAttachment } from "./Ocr";
 import { Train } from "./Train";
-import { getReservationNumber, ReservationCollection } from "./Reservation";
+import { getReservationNumber } from "./Reservation";
+import { ReservationCollection } from "./ReservationCollection";
 import { stationToTimeZone } from "./TzData";
 import { fail } from "assert";
 
@@ -107,74 +108,29 @@ function getCancelledReservationNumbers(): string[] {
  * automatically, like with Gmail's native support for airline reservations.
  */
 function autoSync() {
-  // Remove cancellations from Calendar
-  const cancelledReservationNumbers = getCancelledReservationNumbers();
-  const reservationThreads = getReservationThreads();
-
-  // Information returned to the caller.
-  const reservationsFound = [];
-  const trainsSynced = [];
-  const reservationsFailed = [];
-  const reservationsAlreadyPresent = [];
-
-  for (const reservationThread of reservationThreads) {
-    for (const message of reservationThread.getMessages()) {
-      // Checking the message body is cheaper than OCRing text. Scan the email for
-      // trains that should be synced. If we don't find any, we can skip the OCR.
-      const messageBody = message.getBody();
-      const reservationNumber = getReservationNumber(messageBody);
-
-      reservationsFound.push(reservationNumber);
-
-      const reservationCalendarEvents = getReservationCalendarEvents(
-        reservationNumber
-      );
-      if (reservationCalendarEvents.length !== 0) {
-        reservationsAlreadyPresent.push(reservationNumber);
-
-        // At least one train from the reservation is already on the calendar. Skip.
-        // FIXME: If one, but not both, trains are on the calendar, we should
-        // sync the absent one. Check the message body text for being a one-way
-        // or round-trip ticket, and try to detect this situation.
-        if (cancelledReservationNumbers.indexOf(reservationNumber) !== -1) {
-          for (const event of reservationCalendarEvents) {
-            event.deleteEvent();
-          }
-        }
-      }
-
+  const reservations = new ReservationCollection();
+  for (const thread of getReservationThreads()) {
+    for (const message of thread.getMessages()) {
       const attachment = message.getAttachments()[0];
       const ticketText = ocrAttachment(attachment);
       if (ticketText === null) {
-        reservationsFailed.push(reservationNumber);
+        // FIXME: Report OCR failure.
         continue;
       }
-
-      let trains: Train[] = [];
-      // FIXME: There's room for improvement in the logic here. This will sync both
-      // trains in a round trip, even if one already has a calendar event, possibly
-      // resulting in duplicate reservations.
-      try {
-        trains = Train.FromOcrText(ticketText);
-      } catch (error) {
-        reservationsFailed.push(reservationNumber);
-        continue;
-      }
-
-      for (const train of trains) {
-        if (syncCalendarEvent(train, reservationNumber)) {
-          trainsSynced.push(train.toParams());
-        }
-      }
+      reservations.addOcrText(message.getDate(), ticketText);
     }
   }
+  for (const cancelledReservationNumber of getCancelledReservationNumbers()) {
+    reservations.cancel(cancelledReservationNumber);
+  }
 
-  return {
-    reservationsFound: reservationsFound,
-    reservationsFailed: reservationsFailed,
-    reservationsAlreadyPresent: reservationsAlreadyPresent,
-    trainsSynced: trainsSynced,
-  };
+  reservations.syncToCalendar();
+
+  clearGlitchedEvents();
+
+  // FIXME: Include error reporting from the last run. Store the information in
+  // user-local storage, and display it the next time they load the page.
+  // Perhaps include information on filing a bug report.
 }
 
 /**

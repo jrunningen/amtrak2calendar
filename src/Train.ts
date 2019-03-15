@@ -282,4 +282,50 @@ export class Train {
       name: this.name,
     };
   }
+
+  public calendarEventParams(): [string, Date, Date] {
+    // Arguments are:
+    // title
+    // startTime
+    // endTime
+    // See https://developers.google.com/apps-script/reference/calendar/calendar#createEvent(String,Date,Date)
+    return [this.description, this.depart.toDate(), this.arrive.toDate()];
+  }
+
+  public static calendarEventDescription(reservationNumber: string) {
+    return (
+      "Reservation number: " +
+      reservationNumber +
+      "\nCreated by Amtrak2Calendar"
+    );
+  }
+
+  /**
+   * This predicate determines if this train matches the given calendar event.
+   * It's used to determine if an event already exists, and therefore doesn't
+   * need to created for this train.
+   */
+  public matchCalendarEvent(
+    reservationNumber: string,
+    event: GoogleAppsScript.Calendar.CalendarEvent
+  ): boolean {
+    const paramsFromCalendarEvent = [
+      event.getTitle(),
+      event.getStartTime(),
+      event.getEndTime(),
+    ];
+    const calendarEventParams = this.calendarEventParams();
+    for (const i in this.calendarEventParams) {
+      if (calendarEventParams[i] !== paramsFromCalendarEvent[i]) {
+        return false;
+      }
+    }
+    if (
+      event.getDescription() !==
+      Train.calendarEventDescription(reservationNumber)
+    ) {
+      return false;
+    }
+    return true;
+  }
 }
