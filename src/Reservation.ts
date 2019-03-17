@@ -238,11 +238,19 @@ export class Reservation {
       createCalendarEvent(train, this.reservationNumber);
     }
 
+    // An array to track whether each train in this reservation has a match, by
+    // index. This prevents each train from matching twice.
+    const trainMatchesByIndex = this.trains.map((t: Train) => false);
+
     // Second, delete unmatched calendar events.
     for (const event of reservationCalendarEvents) {
-      for (const train of this.trains) {
+      for (const trainIndex in this.trains) {
+        const train = this.trains[trainIndex];
         if (train.matchCalendarEvent(this.reservationNumber, event)) {
-          continue;
+          if (trainMatchesByIndex[trainIndex] === false)  {
+            trainMatchesByIndex[trainIndex] = true;
+            continue;
+          }
         }
       }
       console.info("deleting train event");
