@@ -1,5 +1,6 @@
 import { Reservation } from "../src/Reservation";
-import { Train, DATE_FORMAT_NO_TZ } from "../src/Train";
+import { Train } from "../src/Train";
+import { formatMomentNoTz } from "../src/DateFormat";
 import {
   dummyDate,
   newerDummyDate,
@@ -138,22 +139,22 @@ describe("Reservation", () => {
       reservationNumber: "ABCDEF",
       trains: [
         {
-          depart: ezDateNoTz("2019-04-19 15:35").format(DATE_FORMAT_NO_TZ),
+          depart: formatMomentNoTz(ezDateNoTz("2019-04-19 15:35")),
           name: "173",
         },
         {
-          depart: ezDateNoTz("2019-04-21 20:30").format(DATE_FORMAT_NO_TZ),
+          depart: formatMomentNoTz(ezDateNoTz("2019-04-21 20:30")),
           name: "90",
         },
       ],
       rescheduledTrains: [
         [
           {
-            depart: ezDateNoTz("2019-03-15 15:35").format(DATE_FORMAT_NO_TZ),
+            depart: formatMomentNoTz(ezDateNoTz("2019-03-15 15:35")),
             name: "173",
           },
           {
-            depart: ezDateNoTz("2019-03-17 20:30").format(DATE_FORMAT_NO_TZ),
+            depart: formatMomentNoTz(ezDateNoTz("2019-03-17 20:30")),
             name: "90",
           },
         ],
@@ -195,22 +196,22 @@ describe("Reservation", () => {
       reservationNumber: "ABCDEF",
       trains: [
         {
-          depart: ezDateNoTz("2019-04-19 15:35").format(DATE_FORMAT_NO_TZ),
+          depart: formatMomentNoTz(ezDateNoTz("2019-04-19 15:35")),
           name: "Train 173: NEW YORK (PENN STATION), NY - WASHINGTON, DC",
         },
         {
-          depart: ezDateNoTz("2019-04-21 20:30").format(DATE_FORMAT_NO_TZ),
+          depart: formatMomentNoTz(ezDateNoTz("2019-04-21 20:30")),
           name: "Train 90: WASHINGTON, DC - NEW YORK (PENN STATION), NY",
         },
       ],
       rescheduledTrains: [
         [
           {
-            depart: ezDateNoTz("2019-03-15 15:35").format(DATE_FORMAT_NO_TZ),
+            depart: formatMomentNoTz(ezDateNoTz("2019-03-15 15:35")),
             name: "Train 173: NEW YORK (PENN STATION), NY - WASHINGTON, DC",
           },
           {
-            depart: ezDateNoTz("2019-03-17 20:30").format(DATE_FORMAT_NO_TZ),
+            depart: formatMomentNoTz(ezDateNoTz("2019-03-17 20:30")),
             name: "Train 90: WASHINGTON, DC - NEW YORK (PENN STATION), NY",
           },
         ],

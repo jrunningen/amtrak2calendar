@@ -1,8 +1,6 @@
 import * as moment from "moment-timezone";
 import { stationToTimeZone } from "./TzData";
-
-export const DATE_FORMAT = "ddd, MMM D YYYY, h:mm A z";
-export const DATE_FORMAT_NO_TZ = "ddd, MMM D YYYY, h:mm A";
+import { formatMoment, formatMomentNoTz } from "./DateFormat";
 
 function ocrRegexp(): RegExp {
   const regexpParts: RegExp[] = [
@@ -64,11 +62,11 @@ export class Train {
   }
 
   public get departString(): string {
-    return this.depart.format(DATE_FORMAT);
+    return formatMoment(this.depart);
   }
 
   public get arriveString(): string {
-    return this.arrive.format(DATE_FORMAT);
+    return formatMoment(this.arrive);
   }
 
   public get departTimeZone(): string {
@@ -272,10 +270,10 @@ export class Train {
   public toDisplayObject() {
     let departString: string = "???";
     if (this.depart !== null) {
-      departString = this.depart.format(DATE_FORMAT);
+      departString = formatMoment(this.depart);
     }
     if (this.departLocalTime !== null) {
-      departString = this.departLocalTime.format(DATE_FORMAT_NO_TZ);
+      departString = formatMomentNoTz(this.departLocalTime);
     }
     return {
       depart: departString,
