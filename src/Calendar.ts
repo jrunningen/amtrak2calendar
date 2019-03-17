@@ -87,7 +87,10 @@ export function getReservationCalendarEvents(reservationNumber: string) {
   const oneYearFromNow = new Date(
     now.getTime() + 12 * 30 * 24 * 60 * 60 * 1000
   );
-  return getCalendar().getEvents(now, oneYearFromNow, {
+  const oneYearAgo = new Date(
+    now.getTime() - 12 * 30 * 24 * 60 * 60 * 1000
+  );
+  return getCalendar().getEvents(oneYearAgo, oneYearFromNow, {
     search: `Amtrak2Calendar ${reservationNumber}`,
   });
 }
