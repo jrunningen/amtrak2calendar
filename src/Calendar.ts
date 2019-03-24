@@ -101,30 +101,3 @@ export function clearGlitchedEvents() {
     event.deleteEvent();
   }
 }
-
-/**
- * Add a train to the calender unless it's already present.
- *
- * @param train The train to create an event for.
- * @returns boolean True if an event was created, false if the event already
- *     exists.
- */
-export function syncCalendarEvent(train: Train, reservationNumber: string) {
-  // TODO(jrunningen): This should ideally also find differences in the calendar
-  // event dates, and delete or recreate it if necessary.
-  if (getTrainCalendarEvents(train, reservationNumber).length > 0) {
-    return false;
-  }
-  createCalendarEvent(train, reservationNumber);
-  return true;
-}
-
-// FIXME: Just make this a method of the train class, maybe.
-export function createCalendarEvent(train: Train, reservationNumber: string) {
-  const cal = getCalendar();
-  const event = cal.createEvent.apply(cal, train.calendarEventParams());
-  event.setDescription(
-    "Reservation number: " + reservationNumber + "\nCreated by Amtrak2Calendar"
-  );
-  event.addGuest(Session.getEffectiveUser().getEmail());
-}

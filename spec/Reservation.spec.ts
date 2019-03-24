@@ -8,6 +8,8 @@ import {
   ezDateNoTz,
   momentEqualityTester,
   testFileText,
+  createMockEvent,
+  createMockEventFromTrain,
 } from "./support/Util";
 
 describe("Reservation", () => {
@@ -447,5 +449,148 @@ describe("Reservation", () => {
       );
       expect(reservation).toEqual(testCases.get(file));
     }
+  });
+
+  it("adds new trains to the calendar", () => {
+    const reservation = new Reservation("123456", dummyDate, [
+      Train.Legacy(
+        "174",
+        "WAS",
+        "NYP",
+        ezDate("2019-01-18 10:10 -0500"),
+        ezDate("2019-01-18 13:35 -0500")
+      ),
+      Train.Legacy(
+        "2257",
+        "NYP",
+        "WAS",
+        ezDate("2019-01-21 19:00 -0500"),
+        ezDate("2019-01-21 21:59 -0500")
+      ),
+    ]);
+
+    spyOn(reservation.trains[0], "createCalendarEvent").and.stub();
+    spyOn(reservation.trains[1], "createCalendarEvent").and.stub();
+
+    reservation.syncEvents([]);
+
+    expect(reservation.trains[0].createCalendarEvent).toHaveBeenCalled();
+    expect(reservation.trains[1].createCalendarEvent).toHaveBeenCalled();
+  });
+
+  it("leaves up to date calendar unchanged", () => {
+    const reservation = new Reservation("123456", dummyDate, [
+      Train.Legacy(
+        "174",
+        "WAS",
+        "NYP",
+        ezDate("2019-01-18 10:10 -0500"),
+        ezDate("2019-01-18 13:35 -0500")
+      ),
+      Train.Legacy(
+        "2257",
+        "NYP",
+        "WAS",
+        ezDate("2019-01-21 19:00 -0500"),
+        ezDate("2019-01-21 21:59 -0500")
+      ),
+    ]);
+
+    spyOn(reservation.trains[0], "createCalendarEvent").and.stub();
+    spyOn(reservation.trains[1], "createCalendarEvent").and.stub();
+
+    const events = [
+      createMockEventFromTrain(reservation.trains[0], reservation.reservationNumber),
+      createMockEventFromTrain(reservation.trains[1], reservation.reservationNumber),
+    ];
+
+    expect(reservation.trains[0].matchCalendarEvent(reservation.reservationNumber, events[0])).toBeTruthy();
+    expect(reservation.trains[1].matchCalendarEvent(reservation.reservationNumber, events[1])).toBeTruthy();
+
+    reservation.syncEvents(events);
+
+    expect(reservation.trains[0].createCalendarEvent).not.toHaveBeenCalled();
+    expect(reservation.trains[1].createCalendarEvent).not.toHaveBeenCalled();
+    expect(events[0].deleteEvent).not.toHaveBeenCalled();
+    expect(events[1].deleteEvent).not.toHaveBeenCalled();
+  });
+
+  it("removes duplicate events", () => {
+    const reservation = new Reservation("123456", dummyDate, [
+      Train.Legacy(
+        "174",
+        "WAS",
+        "NYP",
+        ezDate("2019-01-18 10:10 -0500"),
+        ezDate("2019-01-18 13:35 -0500")
+      ),
+      Train.Legacy(
+        "2257",
+        "NYP",
+        "WAS",
+        ezDate("2019-01-21 19:00 -0500"),
+        ezDate("2019-01-21 21:59 -0500")
+      ),
+    ]);
+
+    spyOn(reservation.trains[0], "createCalendarEvent").and.stub();
+    spyOn(reservation.trains[1], "createCalendarEvent").and.stub();
+
+    const events = [
+      createMockEventFromTrain(reservation.trains[0], reservation.reservationNumber),
+      createMockEventFromTrain(reservation.trains[0], reservation.reservationNumber),
+      createMockEventFromTrain(reservation.trains[1], reservation.reservationNumber),
+      createMockEventFromTrain(reservation.trains[1], reservation.reservationNumber),
+    ];
+
+    reservation.syncEvents(events);
+
+    expect(reservation.trains[0].createCalendarEvent).not.toHaveBeenCalled();
+    expect(reservation.trains[1].createCalendarEvent).not.toHaveBeenCalled();
+    expect(events[0].deleteEvent).not.toHaveBeenCalled();
+    expect(events[1].deleteEvent).toHaveBeenCalled();
+    expect(events[2].deleteEvent).not.toHaveBeenCalled();
+    expect(events[3].deleteEvent).toHaveBeenCalled();
+  });
+
+  it("removes non-matching events", () => {
+    const reservation = new Reservation("123456", dummyDate, [
+      Train.Legacy(
+        "174",
+        "WAS",
+        "NYP",
+        ezDate("2019-01-18 10:10 -0500"),
+        ezDate("2019-01-18 13:35 -0500")
+      ),
+      Train.Legacy(
+        "2257",
+        "NYP",
+        "WAS",
+        ezDate("2019-01-21 19:00 -0500"),
+        ezDate("2019-01-21 21:59 -0500")
+      ),
+    ]);
+
+    spyOn(reservation.trains[0], "createCalendarEvent").and.stub();
+    spyOn(reservation.trains[1], "createCalendarEvent").and.stub();
+
+    const events = [
+      createMockEventFromTrain(reservation.trains[0], reservation.reservationNumber),
+      createMockEventFromTrain(reservation.trains[1], reservation.reservationNumber),
+      createMockEvent(
+        "other title",
+        reservation.trains[0].depart.toDate(),
+        reservation.trains[0].arrive.toDate(),
+        "other description",
+      ),
+    ];
+
+    reservation.syncEvents(events);
+
+    expect(reservation.trains[0].createCalendarEvent).not.toHaveBeenCalled();
+    expect(reservation.trains[1].createCalendarEvent).not.toHaveBeenCalled();
+    expect(events[0].deleteEvent).not.toHaveBeenCalled();
+    expect(events[1].deleteEvent).not.toHaveBeenCalled();
+    expect(events[2].deleteEvent).toHaveBeenCalled();
   });
 });

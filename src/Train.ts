@@ -1,6 +1,7 @@
 import * as moment from "moment-timezone";
 import { stationToTimeZone } from "./TzData";
 import { formatMoment, formatMomentNoTz } from "./DateFormat";
+import { getCalendar } from "./Calendar";
 
 function ocrRegexp(): RegExp {
   const regexpParts: RegExp[] = [
@@ -281,16 +282,7 @@ export class Train {
     };
   }
 
-  public calendarEventParams(): [string, Date, Date] {
-    // Arguments are:
-    // title
-    // startTime
-    // endTime
-    // See https://developers.google.com/apps-script/reference/calendar/calendar#createEvent(String,Date,Date)
-    return [this.description, this.depart.toDate(), this.arrive.toDate()];
-  }
-
-  public static calendarEventDescription(reservationNumber: string) {
+  public calendarEventDescription(reservationNumber: string) {
     return (
       "Reservation number: " +
       reservationNumber +
@@ -305,25 +297,31 @@ export class Train {
    */
   public matchCalendarEvent(
     reservationNumber: string,
-    event: GoogleAppsScript.Calendar.CalendarEvent
+    event: GoogleAppsScript.Calendar.CalendarEvent,
   ): boolean {
-    const paramsFromCalendarEvent = [
-      event.getTitle(),
-      event.getStartTime(),
-      event.getEndTime(),
-    ];
-    const calendarEventParams = this.calendarEventParams();
-    for (const i in this.calendarEventParams) {
-      if (calendarEventParams[i] !== paramsFromCalendarEvent[i]) {
-        return false;
-      }
+    if (event.getTitle() !== this.description) {
+      return false;
     }
-    if (
-      event.getDescription() !==
-      Train.calendarEventDescription(reservationNumber)
-    ) {
+    if (!this.depart.isSame(event.getStartTime())) {
+      return false;
+    }
+    if (!this.arrive.isSame(event.getEndTime())) {
+      return false;
+    }
+    if (event.getDescription() !== this.calendarEventDescription(reservationNumber)) {
       return false;
     }
     return true;
+  }
+
+  public createCalendarEvent(reservationNumber: string) {
+    const cal = getCalendar();
+    const event = cal.createEvent(
+      this.description,
+      this.depart.toDate(),
+      this.arrive.toDate(),
+    );
+    event.setDescription(this.calendarEventDescription(reservationNumber));
+    event.addGuest(Session.getEffectiveUser().getEmail());
   }
 }

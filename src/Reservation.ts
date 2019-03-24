@@ -1,5 +1,5 @@
 // prettier-ignore
-import { createCalendarEvent, getReservationCalendarEvents, syncCalendarEvent } from "./Calendar";
+import { getReservationCalendarEvents } from "./Calendar";
 import { Train } from "./Train";
 
 export function getReservationNumber(messageBody) {
@@ -215,6 +215,11 @@ export class Reservation {
       this.reservationNumber
     );
 
+    this.syncEvents(reservationCalendarEvents);
+  }
+
+  public syncEvents(reservationCalendarEvents:  GoogleAppsScript.Calendar.CalendarEvent[]) {
+
     // If this reservation is cancelled, delete all of the events.
     if (this.isCancelled) {
       for (const event of reservationCalendarEvents) {
@@ -228,14 +233,18 @@ export class Reservation {
 
     // First, sync unmatched trains.
     for (const train of this.trains) {
+      let matchFound = false;
       for (const event of reservationCalendarEvents) {
         if (train.matchCalendarEvent(this.reservationNumber, event)) {
           console.info("matched train event");
-          continue;
+          matchFound = true;
+          break;
         }
       }
-      console.info("creating train event");
-      createCalendarEvent(train, this.reservationNumber);
+      if (!matchFound) {
+        console.info("creating train event");
+        train.createCalendarEvent(this.reservationNumber);
+      }
     }
 
     // An array to track whether each train in this reservation has a match, by
@@ -244,17 +253,21 @@ export class Reservation {
 
     // Second, delete unmatched calendar events.
     for (const event of reservationCalendarEvents) {
+      let matchFound = false;
       for (const trainIndex in this.trains) {
         const train = this.trains[trainIndex];
         if (train.matchCalendarEvent(this.reservationNumber, event)) {
           if (trainMatchesByIndex[trainIndex] === false)  {
+            matchFound = true;
             trainMatchesByIndex[trainIndex] = true;
-            continue;
+            break;
           }
         }
       }
-      console.info("deleting train event");
-      event.deleteEvent();
+      if (!matchFound) {
+        console.info("deleting train event");
+        event.deleteEvent();
+      }
     }
   }
 

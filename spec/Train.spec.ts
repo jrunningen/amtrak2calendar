@@ -2,6 +2,7 @@ import * as moment from "moment-timezone";
 import { Reservation } from "../src/Reservation";
 import { Train } from "../src/Train";
 import { ezDate, momentEqualityTester, testFileText } from "./support/Util";
+import { createMockEventFromTrain } from "./support/Util";
 
 describe("Train", () => {
   beforeEach(() => {
@@ -99,5 +100,45 @@ describe("Train", () => {
       name: "Train 173: NEW YORK (PENN STATION), NY - WASHINGTON, DC",
       depart: "Mon, Jan 21 2019, 7:00 PM",
     });
+  });
+
+  it('matches calendar events', () => {
+    const reservationNumber = 'ABC123';
+    const train = Train.Legacy(
+      "123",
+      "WAS",
+      "NYP",
+      ezDate("2017-01-01 10:23 -0400"),
+      ezDate("2017-02-02 23:45 -0400")
+    );
+    const event = jasmine.createSpyObj('event', [
+      'getTitle',
+      'getStartTime',
+      'getEndTime',
+      'getDescription'
+    ]);
+    event.getTitle.and.returnValue("Amtrak Train 123: WAS -> NYP");
+    event.getStartTime.and.returnValue(train.depart.toDate());
+    event.getEndTime.and.returnValue(train.arrive.toDate());
+    event.getDescription.and.returnValue(
+      "Reservation number: ABC123\nCreated by Amtrak2Calendar");
+
+    expect(train.description).toEqual("Amtrak Train 123: WAS -> NYP");
+    expect(train.calendarEventDescription(reservationNumber)).toEqual(
+      "Reservation number: ABC123\nCreated by Amtrak2Calendar");
+    expect(train.matchCalendarEvent(reservationNumber, event)).toEqual(true);
+  });
+
+  it('has a test helper for making equivalent events', () => {
+    const reservationNumber = "ABC123";
+    const train = Train.Legacy(
+      "123",
+      "WAS",
+      "NYP",
+      ezDate("2017-01-01 10:23 -0400"),
+      ezDate("2017-02-02 23:45 -0400")
+    );
+    const event = createMockEventFromTrain(train, reservationNumber);
+    expect(train.matchCalendarEvent(reservationNumber, event)).toBeTruthy();
   });
 });
