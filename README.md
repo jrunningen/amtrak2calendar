@@ -24,10 +24,12 @@ and sync them to your calendar as necessary.
 
 1. Accept all the permissions. When it says *This app isn't verified*, click
    **Advanced**, then **Go to Copy of Amtrak2Calendar (unsafe)** 
-   a. **By the way**, I know asking people to opt-in to my unverified app
-      isn't a great look. I'm currently Google to verify the OAuth screen,
-      and eventually, I hope to get this into the [GSuite
-      Marketplace](https://gsuite.google.com/marketplace).
+
+   By the way, I know asking people to opt-in to my unverified app
+   isn't a great look. I'm currently Google to verify the OAuth screen,
+   and eventually, I hope to get this into the [GSuite
+   Marketplace](https://gsuite.google.com/marketplace).
+
 2. You should see the Amtrak2Calendar web UI, showing all the Amtrak
    reservations found in your GMail account. Scroll down, and enable
    *Auto-sync*.
