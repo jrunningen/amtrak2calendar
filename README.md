@@ -88,14 +88,9 @@ Here's how you do it:
 
 ## Manual build
 
-If you'd like to be sure that the code reading your e-mail is the same code in
-this repo, you can also build this add-on yourself.
-
-1. Clone this repo.
-2. Install [clasp](https://github.com/google/clasp).
-3. Use clasp to push this code to a new project.
-4. Publish a developer version.
-5. Install the developer version in your GMail account.
+If you'd like to develop this code, use
+[clasp](https://github.com/google/clasp) to compile the TypeScript into
+Google Apps Script, and then deploy it to your own instance of the script.
 
 # Explanation of permissions
 
