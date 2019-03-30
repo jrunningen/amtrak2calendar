@@ -22,6 +22,17 @@ then you can click the button to "enable auto-sync."
 From then on, Amtrak2Calendar will scan for new Amtrak tickets once per hour,
 and sync them to your calendar as necessary.
 
+1. Accept all the permissions. You're granting these permissions to your own
+   account, not to my instance. When it says *This app isn't verified*, click
+   **Advanced**, then **Go to Copy of Amtrak2Calendar (unsafe)** 
+   a. **By the way**, I know asking people to opt-in to my unverified app
+      isn't a great look. I'm currently Google to verify the OAuth screen,
+      and eventually, I hope to get this into the [GSuite
+      Marketplace](https://gsuite.google.com/marketplace).
+2. You should see the Amtrak2Calendar web UI, showing all the Amtrak
+   reservations found in your GMail account. Scroll down, and enable
+   *Auto-sync*.
+
 ## Deployments
 
 http://amtrak2calendar.runningen.net is Amtrak2Calendar's stable version. Users
@@ -41,6 +52,39 @@ using Amtrak2Calendar, I'd love to hear how I can make it more useful. You can:
 1. [Create an issue](https://github.com/jrunningen/amtrak2calendar/issues/new)
    on this repository.
 2. Send an email to amtrak2calendar-users@googlegroups.com.
+
+## Making your own copy
+
+You can copy the script to run under your own account, instead of the script
+that I manage. This is a good choice if you're willing to do a tiny amount of
+extra work, for the guarantee that nobody but you can see your data. This has
+the following tradeoffs:
+
+- The script will be isolated to a Google project that only you control.
+- If I make updates or bug fixes to the project, you won't get them unless
+  you copy the script again.
+- I won't be able to see how many people are using this on my main dashboard
+  (doesn't affect you, but interesting for me to know)
+
+Here's how you do it:
+
+1. Go to the [Amtrak2Calendar project in Google
+   Scripts](https://script.google.com/d/16N8B7R4oi0fVO3Aqh5fXICTbNsP5uKi_F1ZhJ_SX8X6JJ_M6GhxrYcyV/edit?usp=sharing)
+2. Click **File -> Make a Copy**. You now have your own copy of the script,
+   independent of anything I control (except the banner image on the web UI,
+   but hopefully you don't consider that a security risk, and if you do, you
+   can change the source code to not use it).
+3. Click **Publish -> Deploy from manifest**.
+4. Click the little globe icon.
+5. Click the link that looks like
+   `https://script.google.com/macros/s/random-letters-here/exec`. That's the
+   dashboard for your copy of the script.
+6. Accept all the permissions. You're granting these permissions to your own
+   account, not to my instance. When it says *This app isn't verified*, click
+   **Advanced**, then **Go to Copy of Amtrak2Calendar (unsafe)**
+7. You should see the Amtrak2Calendar web UI, showing all the Amtrak
+   reservations found in your GMail account. Scroll down, and enable
+   *Auto-sync*.
 
 ## Manual build
 
