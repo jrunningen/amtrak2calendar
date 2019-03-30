@@ -22,8 +22,7 @@ then you can click the button to "enable auto-sync."
 From then on, Amtrak2Calendar will scan for new Amtrak tickets once per hour,
 and sync them to your calendar as necessary.
 
-1. Accept all the permissions. You're granting these permissions to your own
-   account, not to my instance. When it says *This app isn't verified*, click
+1. Accept all the permissions. When it says *This app isn't verified*, click
    **Advanced**, then **Go to Copy of Amtrak2Calendar (unsafe)** 
    a. **By the way**, I know asking people to opt-in to my unverified app
       isn't a great look. I'm currently Google to verify the OAuth screen,
