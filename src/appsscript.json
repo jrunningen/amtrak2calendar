@@ -23,7 +23,7 @@
   },
   "urlFetchWhitelist": [
     "https://momentjs.com/downloads/moment.min.js",
-    "https://momentjs.com/downloads/moment-timezone-with-data-2012-2022.min.js"
+    "https://momentjs.com/downloads/moment-timezone-with-data-10-year-range.js"
   ],
   "exceptionLogging": "STACKDRIVER"
 }

@@ -31,6 +31,6 @@ function require() {
   return module.exports;
 }
 eval(UrlFetchApp.fetch('https://momentjs.com/downloads/moment.min.js').getContentText());
-eval(UrlFetchApp.fetch('https://momentjs.com/downloads/moment-timezone-with-data-2012-2022.min.js').getContentText());
+eval(UrlFetchApp.fetch('https://momentjs.com/downloads/moment-timezone-with-data-10-year-range.js').getContentText());
 const moment = module.exports;
 module.exports = exportsOrig;
