@@ -4,13 +4,12 @@
 import * as moment from "moment";
 // Prettier will try to wrap long import statements across lines, but this breaks ts2gas compilation.
 // prettier-ignore
-import { clearGlitchedEvents, getCalendar, getTrainCalendarEvents, getReservationCalendarEvents } from "./Calendar";
+import { clearGlitchedEvents, getCalendar, getReservationCalendarEvents, getTrainCalendarEvents } from "./Calendar";
 import { ocrAttachment } from "./Ocr";
-import { Train } from "./Train";
 import { getReservationNumber } from "./Reservation";
 import { ReservationCollection } from "./ReservationCollection";
+import { Train } from "./Train";
 import { stationToTimeZone } from "./TzData";
-import { fail } from "assert";
 
 const SEARCH_RANGE = "6m";
 
@@ -70,8 +69,8 @@ function createAutoSyncTrigger() {
  * Remove all project triggers.
  */
 function removeAllTriggers() {
-  var triggers = ScriptApp.getProjectTriggers();
-  for (var i = 0; i < triggers.length; i++) {
+  const triggers = ScriptApp.getProjectTriggers();
+  for (let i = 0; i < triggers.length; i++) {
     ScriptApp.deleteTrigger(triggers[i]);
   }
 }
@@ -96,7 +95,7 @@ function getCancellationThreads(): GoogleAppsScript.Gmail.GmailThread[] {
 
 function getCancelledReservationNumbers(): string[] {
   return getCancellationThreads().map((thread) =>
-    getReservationNumber(thread.getMessages()[0])
+    getReservationNumber(thread.getMessages()[0].getPlainBody())
   );
 }
 
