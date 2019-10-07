@@ -110,8 +110,14 @@ function autoSync() {
   const reservations = new ReservationCollection();
   for (const thread of getReservationThreads()) {
     for (const message of thread.getMessages()) {
-      const attachment = message.getAttachments()[0];
-      const ticketText = ocrAttachment(attachment);
+      const attachments = message.getAttachments();
+      if (attachments.length <= 0) {
+        // That's odd, Amtrak tickets usually have attachments. Without an attachment, we
+        // can't add the reservation. Just move on.
+        // FIXME: Ideally, this would be reported to the user.
+        continue;
+      }
+      const ticketText = ocrAttachment(attachments[0]);
       if (ticketText === null) {
         // FIXME: Report OCR failure.
         continue;
