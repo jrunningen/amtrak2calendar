@@ -593,4 +593,15 @@ describe("Reservation", () => {
     expect(events[1].deleteEvent).not.toHaveBeenCalled();
     expect(events[2].deleteEvent).toHaveBeenCalled();
   });
+
+  it("handles trains that depart and arrive on different days", () => {
+    const reservation = Reservation.NewBlank();
+    reservation.addOcrText(
+      dummyDate,
+      testFileText("train ends on different day.txt")
+    );
+    const train = reservation.trains[1];
+    expect(train.depart).toEqual(ezDate("2019-12-02 21:05"));
+    expect(train.arrive).toEqual(ezDate("2019-12-03 00:30"));
+  });
 });

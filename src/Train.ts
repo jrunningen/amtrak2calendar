@@ -166,7 +166,6 @@ export class Train {
         }
         firstMatch = false;
 
-        // FIXME: This assumes same-day arrivals.
         // FIXME: Do something sensible if we're missing timezones for one or both stations.
         const departureTime = moment.tz(
           `${dateString} ${year} ${departureString}`,
@@ -178,6 +177,13 @@ export class Train {
           "ddd MMM DD YYYY hh:mm a",
           stationToTimeZone(destination)
         );
+
+        // The arrival time cannot be before the departure time, so if it looks
+        // like that, it means the train crosses over into the next day. Add a
+        // day to the arrival time to account for it.
+        if (arrivalTime < departureTime) {
+          arrivalTime.add(1, 'day');
+        }
 
         trains.push(
           // FIXME: We need a better description than just the train number. It looks weird in calendar.
