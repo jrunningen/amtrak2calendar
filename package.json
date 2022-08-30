@@ -9,7 +9,7 @@
     "@types/node": "^10.17.6",
     "jasmine": "^3.5.0",
     "jasmine-ts": "^0.3.0",
-    "moment-timezone": "^0.5.27",
+    "moment-timezone": "^0.5.35",
     "prettier": "^1.19.1",
     "ts-node": "^7.0.1",
     "tslint": "^5.20.1",
